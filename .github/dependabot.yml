@@ -1,0 +1,14 @@
+version: 2
+updates:
+  - package-ecosystem: maven
+    directory: /
+    schedule:
+      interval: weekly
+    ignore:
+      # La rama principal se mantiene en Spring Boot 3.5.x; la 4.x se trabaja en la guía de migración
+      - dependency-name: org.springframework.boot:spring-boot-starter-parent
+        update-types: [ "version-update:semver-major" ]
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly

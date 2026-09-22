@@ -1,0 +1,13 @@
+# EJ 2.2 - Perfil dev: H2 en memoria y consola web en /h2-console
+spring:
+  h2:
+    console:
+      enabled: true
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+
+logging:
+  level:
+    com.atech: debug

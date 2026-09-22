@@ -1,0 +1,24 @@
+spring:
+  application:
+    name: m4-web-rest-jsp
+  mvc:
+    view:
+      prefix: /WEB-INF/jsp/
+      suffix: .jsp
+    # Errores de Spring MVC en formato RFC 9457 (application/problem+json)
+    problemdetails:
+      enabled: true
+  jpa:
+    open-in-view: false
+    defer-datasource-initialization: true
+  data:
+    web:
+      pageable:
+        max-page-size: 100
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+  api-docs:
+    path: /v3/api-docs
+  packages-to-scan: com.atech.curso.m4.api

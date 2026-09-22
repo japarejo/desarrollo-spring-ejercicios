@@ -1,0 +1,13 @@
+# Keycloak con el realm "atech" importado (usuarios ana/ana y admin/admin)
+# Consola: http://localhost:8180 (admin/admin)
+services:
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.3
+    command: start-dev --import-realm
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+    ports:
+      - "8180:8080"
+    volumes:
+      - ./keycloak:/opt/keycloak/data/import:ro

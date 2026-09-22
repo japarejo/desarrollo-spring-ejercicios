@@ -1,0 +1,25 @@
+# EJ 2.2 - Perfil prod: PostgreSQL. Docker Compose arranca compose.yaml y crea la conexión
+# automáticamente (ServiceConnection); en un entorno real se usarían variables de entorno.
+spring:
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/reservas}
+    username: ${DB_USER:atech}
+    password: ${DB_PASSWORD:atech}
+  docker:
+    compose:
+      enabled: true
+      lifecycle-management: start-only
+  jpa:
+    hibernate:
+      # En el módulo 3 se sustituye por migraciones Flyway + validate
+      ddl-auto: update
+
+# EJ 2.3 - Logging estructurado (Boot 3.4+): ecs, logstash o gelf
+logging:
+  structured:
+    format:
+      console: ecs
+    ecs:
+      service:
+        name: ${spring.application.name}
+        environment: prod

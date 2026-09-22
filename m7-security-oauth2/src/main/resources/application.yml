@@ -1,0 +1,33 @@
+spring:
+  application:
+    name: m7-security-oauth2
+  jpa:
+    open-in-view: false
+  security:
+    oauth2:
+      # EJ 7.1 - Login social. Crear las credenciales en Google Cloud Console y en
+      # GitHub > Settings > Developer settings > OAuth Apps.
+      # Redirect URI: http://localhost:8080/login/oauth2/code/{registrationId}
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_CLIENT_ID:configurar-google-client-id}
+            client-secret: ${GOOGLE_CLIENT_SECRET:configurar}
+            scope: openid, profile, email
+          github:
+            client-id: ${GITHUB_CLIENT_ID:configurar-github-client-id}
+            client-secret: ${GITHUB_CLIENT_SECRET:configurar}
+            scope: read:user, user:email
+      # EJ 7.2 - Resource Server: valida los JWT emitidos por Keycloak (compose.yaml)
+      resourceserver:
+        jwt:
+          issuer-uri: ${KEYCLOAK_ISSUER:http://localhost:8180/realms/atech}
+
+atech:
+  seguridad:
+    # Correos que reciben ROLE_ADMIN al darse de alta
+    admins: admin@atech.es
+
+logging:
+  level:
+    org.springframework.security: info

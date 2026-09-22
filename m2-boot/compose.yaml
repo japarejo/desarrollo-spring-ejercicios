@@ -1,0 +1,10 @@
+# Usado por spring-boot-docker-compose con el perfil prod
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: reservas
+      POSTGRES_USER: atech
+      POSTGRES_PASSWORD: atech
+    ports:
+      - "5432"

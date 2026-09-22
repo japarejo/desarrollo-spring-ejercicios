@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: m1-core-aop
+  main:
+    banner-mode: off
+
+atech:
+  demo:
+    enabled: true

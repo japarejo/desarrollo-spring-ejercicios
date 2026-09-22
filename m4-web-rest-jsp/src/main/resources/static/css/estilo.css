@@ -1,0 +1,8 @@
+body { font-family: system-ui, sans-serif; margin: 2rem; color: #2d2a32; }
+h1 { color: #531f5f; }
+table { border-collapse: collapse; }
+th, td { padding: .4rem .8rem; border-bottom: 1px solid #ddd; text-align: left; }
+tr.par { background: #f7f2f8; }
+.ok { color: #1b7f3b; }
+.error, .errores { color: #b00020; }
+input.error { border: 1px solid #b00020; }

@@ -1,0 +1,62 @@
+{
+  "realm": "atech",
+  "enabled": true,
+  "sslRequired": "none",
+  "accessTokenLifespan": 900,
+  "roles": {
+    "realm": [
+      { "name": "USER", "description": "Usuario de la aplicación de reservas" },
+      { "name": "ADMIN", "description": "Administrador de reservas" }
+    ]
+  },
+  "clients": [
+    {
+      "clientId": "reservas-cli",
+      "name": "Cliente de pruebas (password grant, sólo para el curso)",
+      "enabled": true,
+      "publicClient": true,
+      "directAccessGrantsEnabled": true,
+      "standardFlowEnabled": true,
+      "redirectUris": [ "http://localhost:8080/*" ],
+      "webOrigins": [ "+" ],
+      "protocolMappers": [
+        {
+          "name": "roles-planos",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-realm-role-mapper",
+          "consentRequired": false,
+          "config": {
+            "claim.name": "roles",
+            "jsonType.label": "String",
+            "multivalued": "true",
+            "access.token.claim": "true",
+            "id.token.claim": "true",
+            "userinfo.token.claim": "true"
+          }
+        }
+      ]
+    }
+  ],
+  "users": [
+    {
+      "username": "ana",
+      "email": "ana@atech.es",
+      "firstName": "Ana",
+      "lastName": "García",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [ { "type": "password", "value": "ana", "temporary": false } ],
+      "realmRoles": [ "USER" ]
+    },
+    {
+      "username": "admin",
+      "email": "admin@atech.es",
+      "firstName": "Admin",
+      "lastName": "Atech",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [ { "type": "password", "value": "admin", "temporary": false } ],
+      "realmRoles": [ "USER", "ADMIN" ]
+    }
+  ]
+}

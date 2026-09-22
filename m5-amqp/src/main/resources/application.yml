@@ -1,0 +1,28 @@
+spring:
+  application:
+    name: m5-amqp
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+    # EJ 5.4 - Publisher confirms y returns
+    publisher-confirm-type: correlated
+    publisher-returns: true
+    template:
+      mandatory: true
+    listener:
+      simple:
+        concurrency: 1
+        max-concurrency: 4
+        prefetch: 10
+        # EJ 5.3 - Reintentos locales con backoff exponencial (200 ms, 400 ms)
+        retry:
+          enabled: true
+          max-attempts: 3
+          initial-interval: 200ms
+          multiplier: 2
+          max-interval: 2s
+  docker:
+    compose:
+      lifecycle-management: start-only

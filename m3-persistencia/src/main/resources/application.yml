@@ -1,0 +1,28 @@
+spring:
+  application:
+    name: m3-persistencia
+  jpa:
+    open-in-view: false
+    hibernate:
+      # El esquema lo gestiona Flyway; Hibernate sólo lo valida
+      ddl-auto: validate
+    properties:
+      hibernate:
+        format_sql: true
+  flyway:
+    locations: classpath:db/migration
+
+logging:
+  level:
+    org.hibernate.SQL: debug
+
+---
+# docker compose up -d  &&  mvn spring-boot:run -Dspring-boot.run.profiles=postgres
+spring:
+  config:
+    activate:
+      on-profile: postgres
+  datasource:
+    url: jdbc:postgresql://localhost:5432/reservas
+    username: atech
+    password: atech
