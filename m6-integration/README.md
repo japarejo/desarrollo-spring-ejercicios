@@ -3,8 +3,8 @@
 **Objetivo:** construir con el **DSL Java** un flujo de integración que recibe solicitudes de reserva por dos entradas (REST y base de datos), las procesa aplicando patrones EIP y publica el resultado en RabbitMQ.
 
 ```bash
-cd m6-integration && docker compose up -d
-mvn -pl m6-integration spring-boot:run
+docker compose -f m6-integration/compose.yaml up -d
+./mvnw -pl m6-integration spring-boot:run
 curl -X POST localhost:8080/api/solicitudes -H 'Content-Type: application/json' -d '{
   "id":"S-1","usuario":"ana@atech.es","lineas":[
     {"solicitudId":"S-1","sala":"Turing","fecha":"2030-03-01","horas":2},

@@ -3,9 +3,9 @@
 **Objetivo:** modelar un pequeño servicio de pedidos y notificaciones usando el contenedor IoC, la inyección de dependencias, los perfiles, los eventos de aplicación y la programación orientada a aspectos.
 
 ```bash
-mvn -pl m1-core-aop spring-boot:run                                   # notificador por email
-mvn -pl m1-core-aop spring-boot:run -Dspring-boot.run.profiles=sms    # notificador por SMS
-mvn -pl m1-core-aop test
+./mvnw -pl m1-core-aop spring-boot:run                                   # notificador por email
+./mvnw -pl m1-core-aop spring-boot:run -Dspring-boot.run.profiles=sms    # notificador por SMS
+./mvnw -pl m1-core-aop test
 ```
 
 ## Enunciados

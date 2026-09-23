@@ -3,8 +3,8 @@
 **Objetivo:** publicar eventos de reservas en RabbitMQ y consumirlos de forma fiable: topología con *dead-lettering*, JSON, idempotencia, reintentos y confirmaciones del broker.
 
 ```bash
-cd m5-amqp && docker compose up -d          # RabbitMQ 4.1 + consola en :15672
-mvn -pl m5-amqp spring-boot:run
+docker compose -f m5-amqp/compose.yaml up -d          # RabbitMQ 4.1 + consola en :15672
+./mvnw -pl m5-amqp spring-boot:run
 curl -X POST localhost:8080/api/eventos/reservas-confirmadas -H 'Content-Type: application/json' \
   -d '{"reservaId":"R-1","sala":"Turing","usuario":"ana@atech.es","inicio":"2030-01-10T09:00:00","fin":"2030-01-10T11:00:00","importe":30}'
 ```

@@ -3,10 +3,10 @@
 **Objetivo:** desarrollar la interfaz web de gestión de salas con **JSP + JSTL 3.0** (empaquetado WAR) y una **API REST** de reservas documentada con OpenAPI y probada con MockMvc y REST Assured.
 
 ```bash
-mvn -pl m4-web-rest-jsp spring-boot:run
+./mvnw -pl m4-web-rest-jsp spring-boot:run
 # http://localhost:8080/salas          (JSP)
 # http://localhost:8080/swagger-ui.html (API)
-mvn -pl m4-web-rest-jsp package && java -jar m4-web-rest-jsp/target/m4-web-rest-jsp-1.0.0-SNAPSHOT.war
+./mvnw -pl m4-web-rest-jsp package && java -jar m4-web-rest-jsp/target/m4-web-rest-jsp-1.0.0-SNAPSHOT.war
 ```
 
 ## Enunciados

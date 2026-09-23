@@ -17,4 +17,4 @@ jobs:
           cache: maven
       # Los runners de GitHub tienen Docker: los tests con Testcontainers se ejecutan aquí
       - name: Compilar y probar
-        run: mvn -B -ntp verify
+        run: ./mvnw -B -ntp verify

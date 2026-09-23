@@ -6,9 +6,9 @@
 - **API** (`/api/**`): *Resource Server* sin estado que valida los JWT emitidos por Keycloak.
 
 ```bash
-cd m7-security-oauth2 && docker compose up -d          # Keycloak con el realm "atech"
+docker compose -f m7-security-oauth2/compose.yaml up -d          # Keycloak con el realm "atech"
 export GITHUB_CLIENT_ID=... GITHUB_CLIENT_SECRET=...     # y/o GOOGLE_CLIENT_ID / GOOGLE_CLIENT_SECRET
-mvn -pl m7-security-oauth2 spring-boot:run
+./mvnw -pl m7-security-oauth2 spring-boot:run
 
 # Token de pruebas (password grant, SÓLO para el curso)
 TOKEN=$(curl -s -d grant_type=password -d client_id=reservas-cli -d username=admin -d password=admin \

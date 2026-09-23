@@ -1,0 +1,11 @@
+# Normaliza los finales de linea en el repositorio.
+# Imprescindible con core.autocrlf=true en Windows: sin esto, mvnw se
+# descargaria con CRLF y fallaria en Git Bash / WSL / CI con el error
+# "bad interpreter: /bin/sh^M".
+* text=auto
+
+mvnw      text eol=lf
+*.sh      text eol=lf
+mvnw.cmd  text eol=crlf
+*.cmd     text eol=crlf
+*.bat     text eol=crlf

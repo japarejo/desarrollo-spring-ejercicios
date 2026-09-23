@@ -32,19 +32,21 @@ Cada módulo contiene:
 ## Requisitos
 
 - JDK 21 (compatible con 17–25 en Boot 3.5; Boot 4 exige 17+)
-- Maven 3.9+
+- Maven: **no hace falta instalarlo**. El repositorio incluye Maven Wrapper (`./mvnw`), que descarga y fija Maven 3.9.16 la primera vez que se ejecuta
 - Docker (para `compose.yaml` y los tests con Testcontainers). **Sin Docker, esos tests se omiten** (`@Testcontainers(disabledWithoutDocker = true)`) y el resto funciona con H2.
 - IDE recomendado: IntelliJ IDEA, VS Code con Spring Boot Extension Pack o Spring Tools.
 
 ## Compilar y probar
 
 ```bash
-mvn verify                       # todos los módulos
-mvn -pl m3-persistencia verify   # un módulo
-mvn -pl m2-boot spring-boot:run  # ejecutar un módulo
+./mvnw verify                       # todos los módulos
+./mvnw -pl m3-persistencia verify   # un módulo
+./mvnw -pl m2-boot spring-boot:run  # ejecutar un módulo
 ```
 
-El workflow de GitHub Actions (`.github/workflows/ci.yml`) ejecuta `mvn verify` con JDK 21 en cada *push*. Los runners de GitHub tienen Docker, así que allí también se ejecutan los tests de Testcontainers.
+En Windows (CMD o PowerShell) se usa `mvnw.cmd` en lugar de `./mvnw`: `mvnw.cmd verify`.
+
+El workflow de GitHub Actions (`.github/workflows/ci.yml`) ejecuta `./mvnw verify` con JDK 21 en cada *push*. Los runners de GitHub tienen Docker, así que allí también se ejecutan los tests de Testcontainers.
 
 ## Puertos y servicios
 

@@ -3,9 +3,9 @@
 **Objetivo:** modelar la persistencia de las reservas, escribir consultas de distintos tipos, gestionar el esquema con Flyway, aplicar reglas transaccionales y detectar problemas de rendimiento.
 
 ```bash
-mvn -pl m3-persistencia test                        # H2 + (si hay Docker) PostgreSQL con Testcontainers
-cd m3-persistencia && docker compose up -d
-mvn -pl m3-persistencia spring-boot:run -Dspring-boot.run.profiles=postgres
+./mvnw -pl m3-persistencia test                        # H2 + (si hay Docker) PostgreSQL con Testcontainers
+docker compose -f m3-persistencia/compose.yaml up -d
+./mvnw -pl m3-persistencia spring-boot:run -Dspring-boot.run.profiles=postgres
 ```
 
 ## Modelo
