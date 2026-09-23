@@ -32,7 +32,11 @@ Declara el exchange *topic*, las tres colas con `x-dead-letter-exchange`/`x-dead
 3. Consumidores:
    - `FacturacionListener`: **idempotente**, ignora los duplicados.
    - `NotificacionesListener`: lee la *routing key* recibida.
-   - `AuditoriaListener`: recibe el `Message` sin convertir.
+   - `AuditoriaListener`: recibe el `Message` sin convertir. Como no declara el tipo en la firma,
+     el conversor no puede **inferirlo** y lo resuelve por la cabecera `__TypeId__`; por eso el
+     `Jackson2JsonMessageConverter` declara los *trusted packages* (`com.atech.curso.m5.eventos`).
+     Sin ellos solo se confía en `java.util`/`java.lang`, la conversión falla y el mensaje acaba
+     en `reservas.errores` tras agotar los reintentos.
 
 ### EJ 5.3 · Errores y reintentos
 1. Configura reintentos locales con *backoff* exponencial: `spring.rabbitmq.listener.simple.retry.*`.

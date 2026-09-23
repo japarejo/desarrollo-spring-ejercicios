@@ -76,10 +76,19 @@ public class RabbitConfig {
         return List.of(cola, colaDlq, principal, muerta);
     }
 
-    /** EJ 5.2 - JSON con el ObjectMapper de Boot (soporte java.time). Boot lo aplica a plantilla y listeners. */
+    /**
+     * EJ 5.2 - JSON con el ObjectMapper de Boot (soporte java.time). Boot lo aplica a plantilla y listeners.
+     *
+     * <p><b>Trusted packages</b>: por seguridad, el type mapper solo deserializa clases de
+     * {@code java.util} y {@code java.lang} salvo que se declaren más paquetes. Los listeners que
+     * declaran el tipo en su firma (facturación, notificaciones) usan el <em>tipo inferido</em> del
+     * método y no se ven afectados, pero AuditoriaListener recibe el Message "en bruto": al no haber
+     * tipo inferido, el conversor resuelve la clase por la cabecera {@code __TypeId__} y sin esta
+     * lista fallaría con "is not in the trusted packages".
+     */
     @Bean
     MessageConverter jsonMessageConverter(ObjectMapper objectMapper) {
-        return new Jackson2JsonMessageConverter(objectMapper);
+        return new Jackson2JsonMessageConverter(objectMapper, "com.atech.curso.m5.eventos");
     }
 
     /**
