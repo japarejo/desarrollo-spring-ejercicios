@@ -1,6 +1,6 @@
 # Spring Boot Avanzado · Ejercicios prácticos
 
-Proyecto de ejercicios del curso **Spring Boot Avanzado** (Atech Advanced Solutions).
+Proyecto de ejercicios del curso **Desarrollo de aplicaciones con Spring**.
 Hay un módulo Maven por cada tema del curso, y todos giran en torno al mismo dominio: una aplicación de **reservas de salas**.
 
 | Versión base | Notas |
@@ -60,4 +60,4 @@ El workflow de GitHub Actions (`.github/workflows/ci.yml`) ejecuta `./mvnw verif
 
 ## Licencia
 
-Material docente de uso interno para el curso. © Atech Advanced Solutions.
+Material docente de uso interno para el curso.
