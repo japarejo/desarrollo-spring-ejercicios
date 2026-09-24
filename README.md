@@ -1,4 +1,4 @@
-# Spring Boot Avanzado · Ejercicios prácticos
+# Desarrollo de aplicaciones con Spring · Ejercicios prácticos
 
 Proyecto de ejercicios del curso **Desarrollo de aplicaciones con Spring**.
 Hay un módulo Maven por cada tema del curso, y todos giran en torno al mismo dominio: una aplicación de **reservas de salas**.
