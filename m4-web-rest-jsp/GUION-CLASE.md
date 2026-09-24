@@ -347,7 +347,7 @@ Pestañas del IDE:
    ```
 
    ```json
-   {"openapi":"3.1.0","info":{"title":"API de Reservas","description":"Curso Desarrollo de aplicaciones Spring - Atech...
+   {"openapi":"3.1.0","info":{"title":"API de Reservas","description":"Curso Desarrollo de aplicaciones con Spring - Atech...
    ```
 
 4. **Paginación. ⌨️ Ejecuta y proyecta:**

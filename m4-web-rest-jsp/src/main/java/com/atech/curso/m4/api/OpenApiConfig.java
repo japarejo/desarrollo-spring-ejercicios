@@ -16,7 +16,7 @@ public class OpenApiConfig {
         return new OpenAPI().info(new Info()
                 .title("API de Reservas")
                 .version("v1")
-                .description("Curso Spring Boot Avanzado - Atech Advanced Solutions")
+                .description("Curso Desarrollo de aplicaciones con Spring - Atech Advanced Solutions")
                 .contact(new Contact().name("Formación").email("formacion@atech.es")));
     }
 }

@@ -12,6 +12,6 @@ public class CursoInfoContributor implements InfoContributor {
 
     @Override
     public void contribute(Info.Builder builder) {
-        builder.withDetail("curso", Map.of("nombre", "Spring Boot Avanzado", "modulo", 2));
+        builder.withDetail("curso", Map.of("nombre", "Desarrollo de aplicaciones con Spring", "modulo", 2));
     }
 }

@@ -1,4 +1,4 @@
-# Guión de impartición · Desarrollo de aplicaciones Spring
+# Guión de impartición · Desarrollo de aplicaciones con Spring
 
 El [README](../README.md) describe **qué** contiene el repositorio. Este documento es el **plan del curso**:
 preparación, ritmo, reparto en sesiones, evaluación y recortes.

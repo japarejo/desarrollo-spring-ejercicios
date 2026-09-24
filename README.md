@@ -12,13 +12,14 @@ Hay un módulo Maven por cada tema del curso, y todos giran en torno al mismo do
 
 | Módulo | Tema | Qué se practica |
 |---|---|---|
-| [`m1-core-aop`](m1-core-aop) | Núcleo de Spring y AOP | IoC/DI por constructor, `@Profile`, `@Primary`/`@Qualifier`, eventos, `@Aspect`, auto-invocación, reintentos |
+| [`m1-core-aop`](m1-core-aop) | Núcleo de Spring y AOP | IoC/DI por constructor, `@Profile`, `@Primary`/`@Qualifier`, eventos, `@Aspect`, pista de auditoría, auto-invocación, reintentos |
 | [`m2-boot`](m2-boot) | Spring Boot | Starters, `@ConfigurationProperties` con records, perfiles, logging estructurado, Actuator, autoconfiguración propia, Docker Compose, imágenes OCI |
 | [`m3-persistencia`](m3-persistencia) | Spring Data JPA | Entidades y relaciones, `@Embeddable` record, consultas derivadas, JPQL, proyecciones, Specifications, Flyway, transacciones, bloqueo optimista, N+1, Testcontainers |
 | [`m4-web-rest-jsp`](m4-web-rest-jsp) | Spring MVC | JSP + JSTL 3.0 + formularios, API REST, `ProblemDetail`, paginación, springdoc/OpenAPI, `@WebMvcTest`, REST Assured |
 | [`m5-amqp`](m5-amqp) | RabbitMQ | Exchanges/colas/DLQ, JSON, consumidores idempotentes, reintentos, `RepublishMessageRecoverer`, publisher confirms, Testcontainers |
 | [`m6-integration`](m6-integration) | Spring Integration | `@MessagingGateway`, JDBC poller, filtro, splitter, router, agregador, HTTP y AMQP salientes, `errorChannel`, `MockIntegrationContext` |
 | [`m7-security-oauth2`](m7-security-oauth2) | Spring Security | Varias `SecurityFilterChain`, login social OIDC/OAuth 2.0, alta automática, Resource Server JWT (Keycloak), roles, seguridad de método, `RestClient` + OAuth 2.0, tests |
+| [`extra-xml-config`](extra-xml-config) | *Extra:* configuración XML | El mismo grafo de objetos con `beans.xml`, con `@Configuration`/`@Bean` y mezclando ambos con `@ImportResource`; equivalencias y por qué el XML quedó como legado |
 
 Cada módulo contiene:
 
@@ -28,6 +29,8 @@ Cada módulo contiene:
 - `compose.yaml` con la infraestructura necesaria (PostgreSQL, RabbitMQ, Keycloak) cuando aplica.
 
 > **Cómo usarlo en clase.** Se recomienda que el alumnado cree su propio proyecto con [Spring Initializr](https://start.spring.io) siguiendo el enunciado y consulte este repositorio para comparar. Otra opción es partir de una rama sin las clases de solución y usar los tests de este repositorio como criterio de aceptación.
+>
+> **Para quien imparte el curso:** [docs/GUION-CLASE.md](docs/GUION-CLASE.md) es el plan del curso (preparación, ritmo, reparto en sesiones, evaluación y recortes), y cada módulo tiene su **`GUION-CLASE.md`** con el desarrollo paso a paso de esa clase: cronograma minuto a minuto, comandos exactos, qué proyectar, qué romper en directo y las preguntas para el aula.
 
 ## Requisitos
 

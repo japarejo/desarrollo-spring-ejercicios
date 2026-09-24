@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.atech.curso</groupId>
-        <artifactId>spring-boot-avanzado-ejercicios</artifactId>
+        <artifactId>desarrollo-spring-ejercicios</artifactId>
         <version>1.0.0-SNAPSHOT</version>
     </parent>
     <artifactId>m6-integration</artifactId>
