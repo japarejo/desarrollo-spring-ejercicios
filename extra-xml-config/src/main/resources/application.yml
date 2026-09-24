@@ -1,0 +1,5 @@
+spring:
+  application:
+    name: extra-xml-config
+  main:
+    web-application-type: none

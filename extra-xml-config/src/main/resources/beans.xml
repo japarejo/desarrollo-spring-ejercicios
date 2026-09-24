@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Configuración 100 % XML. Compárese línea a línea con ConfiguracionJava.java:
+    declara EXACTAMENTE los mismos beans, con los mismos nombres.
+
+    Ventaja histórica: se podía recablear la aplicación sin recompilar.
+    Inconvenientes: no hay comprobación de tipos ni autocompletado real, los errores
+    aparecen al arrancar y no al compilar, y los nombres de clase van en cadenas de texto
+    (un refactor de paquete rompe el fichero en silencio).
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           https://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!-- factory-method: bean de una clase de terceros que no tiene constructor público.
+         Equivale a @Bean Clock reloj() { return Clock.systemUTC(); } -->
+    <bean id="reloj" class="java.time.Clock" factory-method="systemUTC"/>
+
+    <!-- Inyección por CONSTRUCTOR + beans internos anónimos dentro de una <list>.
+         init-method/destroy-method declaran el ciclo de vida desde fuera de la clase. -->
+    <bean id="repositorioSalas" class="com.atech.curso.xml.dominio.RepositorioSalasEnMemoria"
+          init-method="inicializar" destroy-method="cerrar">
+        <constructor-arg>
+            <list>
+                <bean class="com.atech.curso.xml.dominio.Sala">
+                    <constructor-arg index="0" value="S-1"/>
+                    <constructor-arg index="1" value="Turing"/>
+                    <constructor-arg index="2" value="12"/>
+                </bean>
+                <bean class="com.atech.curso.xml.dominio.Sala">
+                    <constructor-arg index="0" value="S-2"/>
+                    <constructor-arg index="1" value="Lovelace"/>
+                    <constructor-arg index="2" value="30"/>
+                </bean>
+                <bean class="com.atech.curso.xml.dominio.Sala">
+                    <constructor-arg index="0" value="S-3"/>
+                    <constructor-arg index="1" value="Hopper"/>
+                    <constructor-arg index="2" value="6"/>
+                </bean>
+            </list>
+        </constructor-arg>
+    </bean>
+
+    <!-- Dos implementaciones de Tarifa. primary="true" es el equivalente XML de @Primary:
+         decide cuál gana cuando se inyecta por tipo. Inyección por SETTER con <property>. -->
+    <bean id="tarifaPorHora" class="com.atech.curso.xml.tarifas.TarifaPorHora" primary="true">
+        <property name="precioHora" value="25.00"/>
+    </bean>
+
+    <bean id="tarifaPlana" class="com.atech.curso.xml.tarifas.TarifaPlana">
+        <property name="precioDia" value="120.00"/>
+    </bean>
+
+    <!-- ref: referencia explícita a otro bean por su id. En Java basta con declarar el
+         parámetro y dejar que el contenedor resuelva por tipo. -->
+    <bean id="servicioReservas" class="com.atech.curso.xml.reservas.ServicioReservas">
+        <constructor-arg ref="repositorioSalas"/>
+        <constructor-arg ref="tarifaPorHora"/>
+        <constructor-arg ref="reloj"/>
+    </bean>
+
+    <!-- Ámbito prototype: una instancia nueva en cada getBean(). Equivale a @Scope("prototype"). -->
+    <bean id="borradorReserva" class="com.atech.curso.xml.reservas.BorradorReserva" scope="prototype"/>
+
+</beans>

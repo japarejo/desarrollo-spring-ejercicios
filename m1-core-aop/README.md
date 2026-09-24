@@ -51,6 +51,25 @@
 2. Añade `@Retryable` (Spring Retry) con 3 intentos y *backoff* exponencial, y activa los reintentos con `@EnableRetry`.
 3. Comprueba que, con 2 fallos simulados, el mensaje se envía en el tercer intento.
 
+### EJ 1.7 · La auditabilidad como aspecto
+
+El EJ 1.4 *mide* la ejecución. Aquí interesa otra cosa: dejar **pista de auditoría**, es decir, el rastro funcional de *quién* hizo *qué*, *sobre qué entidad* y *con qué resultado*. Es el interés transversal de manual: aparece en decenas de servicios y no tiene nada que ver con su lógica de negocio.
+
+1. Crea la anotación `@PistaAuditoria(accion, entidad)` y dos anotaciones de **parámetro**: `@IdEntidad` (identifica la entidad afectada) y `@Sensible` (su valor debe enmascararse).
+2. Implementa `PistaAuditoriaAspect` con **`@AfterReturning` y `@AfterThrowing`** en lugar de un `@Around`. ¿Por qué encaja mejor aquí? Porque no necesitas rodear la llamada: solo registrar el desenlace, y así el aspecto no puede tragarse la excepción ni alterar el valor devuelto por descuido.
+3. El aspecto obtiene el *quién* de un bean `UsuarioActual` y el *cuándo* del `Clock` inyectado. **El servicio de negocio no recibe ni propaga esos datos.**
+4. Anota `PedidoService#reembolsar` y comprueba que se registran tanto el éxito como el fallo, que el IBAN aparece enmascarado y que el identificador del pedido va en su propio campo.
+
+*Pista:* para leer las anotaciones de los parámetros necesitas el `Method` de la clase destino:
+`AopUtils.getMostSpecificMethod(((MethodSignature) jp.getSignature()).getMethod(), jp.getTarget().getClass())`.
+Los nombres reales de los parámetros están disponibles porque Spring Boot compila con `-parameters`.
+
+*Para pensar:* ¿qué pasaría si `reembolsar` se llamara desde otro método del propio `PedidoService`? (véase el EJ 1.5). ¿Y si el aspecto fallara al escribir en el libro de auditoría: debe impedir la operación de negocio o no?
+
+*Solución:* paquete `pista` · *Test:* `PistaAuditoriaTest`.
+
+> Ver también el módulo extra [`extra-xml-config`](../extra-xml-config), que compara la configuración XML con la basada en anotaciones.
+
 ## Extra Spring Boot 4
 
 - Cambia `spring-boot-starter-aop` por **`spring-boot-starter-aspectj`**.

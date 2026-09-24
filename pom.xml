@@ -27,6 +27,8 @@
         <module>m5-amqp</module>
         <module>m6-integration</module>
         <module>m7-security-oauth2</module>
+        <!-- Ejemplo extra, fuera del temario numerado -->
+        <module>extra-xml-config</module>
     </modules>
 
     <properties>
