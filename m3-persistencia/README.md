@@ -10,10 +10,103 @@ docker compose -f m3-persistencia/compose.yaml up -d
 
 ## Modelo
 
+El módulo tiene dos dominios independientes: las **reservas de salas** (EJ 3.1 a 3.6) y el **gobierno de
+superhéroes** del ejemplo de transacciones (EJ 3.7). Son las entidades JPA de los paquetes `dominio` y `gobierno`:
+
+```mermaid
+classDiagram
+    direction LR
+
+    namespace Reservas_de_salas {
+        class Sala {
+            <<Entity>>
+            -Long id
+            -String nombre
+            -int capacidad
+            -Direccion direccion
+        }
+        class Direccion {
+            <<Embeddable record>>
+            +String calle
+            +String ciudad
+            +String codigoPostal
+        }
+        class Usuario {
+            <<Entity>>
+            -Long id
+            -String email
+            -String nombre
+        }
+        class Reserva {
+            <<Entity>>
+            -Long id
+            -LocalDateTime inicio
+            -LocalDateTime fin
+            -EstadoReserva estado
+            -String notas
+            -Long version
+            +cancelar()
+        }
+        class EstadoReserva {
+            <<enumeration>>
+            CONFIRMADA
+            CANCELADA
+        }
+    }
+
+    namespace Gobierno_de_superheroes {
+        class Gobierno {
+            <<Entity>>
+            -Long id
+            -int legislatura
+            -LocalDateTime tomaPosesion
+            -LocalDateTime cese
+            -boolean vigente
+            +nombrar(Organo, String) Nombramiento
+            +cesar(LocalDateTime)
+        }
+        class Nombramiento {
+            <<Entity>>
+            -Long id
+            -String titular
+        }
+        class Organo {
+            <<Entity>>
+            -Long id
+            -String nombre
+            -TipoOrgano tipo
+            -int orden
+        }
+        class TipoOrgano {
+            <<enumeration>>
+            PRESIDENCIA
+            VICEPRESIDENCIA
+            MINISTERIO
+            SECRETARIA_DE_ESTADO
+        }
+    }
+
+    Reserva "*" --> "1" Sala : sala · LAZY
+    Reserva "*" --> "1" Usuario : usuario · LAZY
+    Sala *-- "1" Direccion : Embedded
+    Reserva ..> EstadoReserva : Enumerated STRING
+
+    Gobierno "1" *-- "*" Nombramiento : nombramientos · mappedBy gobierno · cascade ALL
+    Nombramiento "*" --> "1" Organo : organo · LAZY
+    Organo ..> TipoOrgano : Enumerated STRING
 ```
-Sala (nombre único, capacidad, Direccion @Embeddable record) 1 ── * Reserva * ── 1 Usuario (email único)
-Reserva: inicio, fin, estado (CONFIRMADA | CANCELADA), notas, @Version
-```
+
+| Qué | Dónde se ve en el diagrama |
+|---|---|
+| `@ManyToOne(fetch = LAZY)` **unidireccional** | `Reserva → Sala` y `Reserva → Usuario`: una reserva conoce su sala, pero la sala no tiene la lista de sus reservas |
+| `@OneToMany(mappedBy = "gobierno", cascade = ALL)` **bidireccional** | `Gobierno ◆── Nombramiento`: el rombo es la composición. Los nombramientos se guardan y se borran con su gobierno, y cada nombramiento apunta a su gobierno |
+| `@Embeddable` record | `Direccion`: no es una entidad ni tiene tabla propia; sus tres campos son columnas de `sala` |
+| `@Enumerated(STRING)` | `EstadoReserva` y `TipoOrgano`: se guarda el nombre (`CONFIRMADA`), nunca el ordinal |
+| `@Version` | `Reserva.version`: el bloqueo optimista (EJ 3.5) |
+| Restricciones únicas | `sala.nombre`, `usuario.email`, `organo.nombre`, `gobierno.legislatura` y el par (`gobierno_id`, `organo_id`) de `nombramiento` |
+
+Las tablas las crea Flyway (`V1` y `V2` para las reservas, `V3` para el gobierno), y Hibernate sólo comprueba que
+coinciden con este diagrama (`ddl-auto: validate`).
 
 ## Enunciados
 
@@ -58,9 +151,8 @@ secretarías de Estado (catálogo en `V3__gobierno_de_superheroes.sql`). Los tit
 nombre aleatorio de **sustantivo + adjetivo**, sin concordancia: *Vengador Holístico*, *Aguja Dinámico*,
 *Croqueta Termonuclear*…
 
-```
-Organo (nombre, tipo, orden) 1 ── * Nombramiento (titular) * ── 1 Gobierno (legislatura, toma de posesión, cese, vigente)
-```
+Las entidades son las de la parte inferior del [diagrama del modelo](#modelo): `Gobierno`, `Nombramiento`,
+`Organo` y el *enum* `TipoOrgano`.
 
 **La alternancia** (`GobiernoService#alternancia`) cambia el gobierno entero en una sola transacción:
 

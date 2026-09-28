@@ -64,6 +64,93 @@ Pestañas del IDE, en orden de uso:
     └─ Direccion (@Embeddable record: calle, ciudad, codigoPostal)
    ```
 
+   **Chuleta para ti** (no la proyectes todavía): el diagrama UML completo del módulo, el mismo que está en el
+   [README](README.md#modelo). La parte de abajo, el gobierno de superhéroes, es la del paso 7c. Proyéctalo al
+   final del paso 2 para comprobar que lo que han escrito en las entidades coincide.
+
+   ```mermaid
+   classDiagram
+       direction LR
+
+       namespace Reservas_de_salas {
+           class Sala {
+               <<Entity>>
+               -Long id
+               -String nombre
+               -int capacidad
+               -Direccion direccion
+           }
+           class Direccion {
+               <<Embeddable record>>
+               +String calle
+               +String ciudad
+               +String codigoPostal
+           }
+           class Usuario {
+               <<Entity>>
+               -Long id
+               -String email
+               -String nombre
+           }
+           class Reserva {
+               <<Entity>>
+               -Long id
+               -LocalDateTime inicio
+               -LocalDateTime fin
+               -EstadoReserva estado
+               -String notas
+               -Long version
+               +cancelar()
+           }
+           class EstadoReserva {
+               <<enumeration>>
+               CONFIRMADA
+               CANCELADA
+           }
+       }
+
+       namespace Gobierno_de_superheroes {
+           class Gobierno {
+               <<Entity>>
+               -Long id
+               -int legislatura
+               -LocalDateTime tomaPosesion
+               -LocalDateTime cese
+               -boolean vigente
+               +nombrar(Organo, String) Nombramiento
+               +cesar(LocalDateTime)
+           }
+           class Nombramiento {
+               <<Entity>>
+               -Long id
+               -String titular
+           }
+           class Organo {
+               <<Entity>>
+               -Long id
+               -String nombre
+               -TipoOrgano tipo
+               -int orden
+           }
+           class TipoOrgano {
+               <<enumeration>>
+               PRESIDENCIA
+               VICEPRESIDENCIA
+               MINISTERIO
+               SECRETARIA_DE_ESTADO
+           }
+       }
+
+       Reserva "*" --> "1" Sala : sala · LAZY
+       Reserva "*" --> "1" Usuario : usuario · LAZY
+       Sala *-- "1" Direccion : Embedded
+       Reserva ..> EstadoReserva : Enumerated STRING
+
+       Gobierno "1" *-- "*" Nombramiento : nombramientos · mappedBy gobierno · cascade ALL
+       Nombramiento "*" --> "1" Organo : organo · LAZY
+       Organo ..> TipoOrgano : Enumerated STRING
+   ```
+
 2. **❓ Gancho:** «En el módulo 2 guardábamos reservas con `ddl-auto: create-drop` y H2 en memoria. ¿Qué
    pasa con los datos al reiniciar?» → Se pierden. «¿Y quién crea las tablas en producción? ¿La aplicación,
    al arrancar, adivinando?» Deja el silencio incómodo un par de segundos.
@@ -399,6 +486,48 @@ README lo explica entero y los tests lo cubren.
    puede estallar un Casoplón, un CutreMaster o unas Joyas Ocultas.» **❓ «Si estalla en el quinto ministerio,
    ¿qué queremos que pase con los cuatro primeros?»** → Que no quede nada: ni gobierno nuevo a medias ni el
    anterior cesado.
+
+   **✏️ Proyecta el modelo** (1 min): un `Gobierno` por legislatura, con un `Nombramiento` por cada `Organo`. El
+   rombo es `cascade = ALL`: los nombramientos se guardan con su gobierno, y por eso el servicio nunca llama a
+   `save` para ellos.
+
+   ```mermaid
+   classDiagram
+       direction LR
+       class Gobierno {
+           <<Entity>>
+           -Long id
+           -int legislatura
+           -LocalDateTime tomaPosesion
+           -LocalDateTime cese
+           -boolean vigente
+           +nombrar(Organo, String) Nombramiento
+           +cesar(LocalDateTime)
+       }
+       class Nombramiento {
+           <<Entity>>
+           -Long id
+           -String titular
+       }
+       class Organo {
+           <<Entity>>
+           -Long id
+           -String nombre
+           -TipoOrgano tipo
+           -int orden
+       }
+       class TipoOrgano {
+           <<enumeration>>
+           PRESIDENCIA
+           VICEPRESIDENCIA
+           MINISTERIO
+           SECRETARIA_DE_ESTADO
+       }
+
+       Gobierno "1" *-- "*" Nombramiento : nombramientos · mappedBy gobierno · cascade ALL
+       Nombramiento "*" --> "1" Organo : organo · LAZY
+       Organo ..> TipoOrgano : Enumerated STRING
+   ```
 
 2. **⌨️ Arranca la aplicación** (es un menú de texto; no termina hasta que eliges `0`):
 
