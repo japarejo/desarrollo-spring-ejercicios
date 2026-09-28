@@ -13,6 +13,7 @@ import com.atech.curso.xml.tarifas.Tarifa;
 import com.atech.curso.xml.tarifas.TarifaPlana;
 import com.atech.curso.xml.tarifas.TarifaPorHora;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -62,6 +63,7 @@ public class ConfiguracionJava {
     }
 
     @Bean
+    @Qualifier("tarifaPlana")
     Tarifa tarifaPlana() {
         TarifaPlana tarifa = new TarifaPlana();
         tarifa.setPrecioDia(new BigDecimal("120.00"));
@@ -73,7 +75,7 @@ public class ConfiguracionJava {
      * {@code @Primary}. En XML había que nombrarla explícitamente con {@code ref="tarifaPorHora"}.
      */
     @Bean
-    ServicioReservas servicioReservas(RepositorioSalas repositorioSalas, Tarifa tarifa, Clock reloj) {
+    ServicioReservas servicioReservas(RepositorioSalas repositorioSalas, @Qualifier("tarifaPlana") Tarifa tarifa, Clock reloj) {
         return new ServicioReservas(repositorioSalas, tarifa, reloj);
     }
 

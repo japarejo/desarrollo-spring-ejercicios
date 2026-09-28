@@ -2,6 +2,7 @@ package com.atech.curso.m1;
 
 import java.math.BigDecimal;
 import java.time.Clock;
+import java.util.List;
 
 import com.atech.curso.m1.pedidos.Pedido;
 import com.atech.curso.m1.pedidos.PedidoService;
@@ -39,7 +40,7 @@ public class M1Application {
     CommandLineRunner demo(PedidoService pedidos) {
         return args -> {
             pedidos.confirmar(new Pedido("P-1", "ana@atech.es", new BigDecimal("120.50")));
-            pedidos.confirmar(new Pedido("P-2", "luis@atech.es", new BigDecimal("2500")));
+            pedidos.confirmarLote(List.of(new Pedido("P-2", "luis@atech.es", new BigDecimal("2500"))));
         };
     }
 }
