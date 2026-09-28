@@ -36,7 +36,7 @@ Pestañas del IDE:
 1. [`src/main/java/com/atech/curso/m5/config/RabbitConfig.java`](src/main/java/com/atech/curso/m5/config/RabbitConfig.java)
 2. [`src/main/java/com/atech/curso/m5/consumidores/FacturacionListener.java`](src/main/java/com/atech/curso/m5/consumidores/FacturacionListener.java)
 3. [`src/main/java/com/atech/curso/m5/productor/PublicadorReservas.java`](src/main/java/com/atech/curso/m5/productor/PublicadorReservas.java)
-4. [`src/main/resources/application.yml`](src/main/resources/application.yml)
+4. [`src/main/resources/application.properties`](src/main/resources/application.properties)
 
 ---
 
@@ -240,15 +240,14 @@ Pestañas del IDE:
      fallar… a máxima velocidad. Es el clásico que tumba un broker.
    - Reintentar unas cuantas veces y, si no hay manera, **apartarlo en un sitio donde alguien lo mire**.
 
-2. **✏️ Proyecta [`application.yml` líneas 17-24](src/main/resources/application.yml#L17-L24):**
+2. **✏️ Proyecta [`application.properties` líneas 14-18](src/main/resources/application.properties#L14-L18):**
 
-   ```yaml
-   retry:
-     enabled: true
-     max-attempts: 3
-     initial-interval: 200ms
-     multiplier: 2
-     max-interval: 2s
+   ```properties
+   spring.rabbitmq.listener.simple.retry.enabled=true
+   spring.rabbitmq.listener.simple.retry.max-attempts=3
+   spring.rabbitmq.listener.simple.retry.initial-interval=200ms
+   spring.rabbitmq.listener.simple.retry.multiplier=2
+   spring.rabbitmq.listener.simple.retry.max-interval=2s
    ```
 
    **🗣️ Di:** «Tres intentos con espera creciente: 200 ms, 400 ms. El *backoff* exponencial no es un
@@ -329,13 +328,12 @@ Pestañas del IDE:
    el broker?» → **No lo sabéis.** El envío es asíncrono: sin confirmaciones, `convertAndSend` solo
    significa «se lo he dado al sistema operativo».
 
-2. **✏️ Proyecta [`application.yml` líneas 10-14](src/main/resources/application.yml#L10-L14):**
+2. **✏️ Proyecta [`application.properties` líneas 7-9](src/main/resources/application.properties#L7-L9):**
 
-   ```yaml
-   publisher-confirm-type: correlated
-   publisher-returns: true
-   template:
-     mandatory: true
+   ```properties
+   spring.rabbitmq.publisher-confirm-type=correlated
+   spring.rabbitmq.publisher-returns=true
+   spring.rabbitmq.template.mandatory=true
    ```
 
 3. **✏️ Y el publicador**
@@ -355,7 +353,7 @@ Pestañas del IDE:
 
 4. **🗣️ `mandatory` y los *returns*, que es lo que menos se conoce:** «Si publicáis con una *routing key*
    que no encaja con **ningún** binding, RabbitMQ **descarta el mensaje en silencio**. Con
-   `mandatory: true` os lo devuelve, y el `setReturnsCallback`
+   `mandatory=true` os lo devuelve, y el `setReturnsCallback`
    ([líneas 28-30](src/main/java/com/atech/curso/m5/productor/PublicadorReservas.java#L28-L30)) lo registra.»
 
    **⌨️ Demuéstralo** publicando con una *routing key* que no existe. Si has añadido un endpoint de prueba,
@@ -440,7 +438,7 @@ Pestañas del IDE:
 
 | Recorte | Ganas | Cómo |
 |---|---|---|
-| Paso 6 (confirms) | 15 min | Cuéntalo con el YAML y el `CompletableFuture` en pantalla, sin demo. |
+| Paso 6 (confirms) | 15 min | Cuéntalo con las propiedades y el `CompletableFuture` en pantalla, sin demo. |
 | Paso 3, ejercicio | 15 min | Da la topología hecha, ejecuta `TopologiaTest` y enseña las colas en la consola. |
 | Paso 7 | 10 min | Ejecuta tú el test y proyecta solo el bloque de Awaitility. |
 
@@ -454,7 +452,7 @@ de ser del módulo.
 | `PRECONDITION_FAILED - inequivalent arg` | Han cambiado los argumentos de una cola ya existente. Borrarla en la consola o `docker compose down -v` |
 | El listener recibe un `LinkedHashMap` | Falta el `MessageConverter` JSON, o la firma no declara el tipo |
 | `is not in the trusted packages` | Faltan los paquetes de confianza en `Jackson2JsonMessageConverter` |
-| El mensaje no llega a ninguna cola | *Routing key* que no encaja con ningún binding. Con `mandatory: true` al menos se registra |
+| El mensaje no llega a ninguna cola | *Routing key* que no encaja con ningún binding. Con `mandatory=true` al menos se registra |
 | El test asíncrono falla a veces | `Thread.sleep` en vez de Awaitility |
 | La cola se llena y no se consume | La aplicación no está arrancada, o el listener está en otra cola. Mira *Consumers* en la consola |
 | Bucle infinito de reintentos | `requeue` sin límite: hay que usar reintentos con `MessageRecoverer` |

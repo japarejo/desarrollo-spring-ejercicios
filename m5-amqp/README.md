@@ -44,7 +44,7 @@ Declara el exchange *topic*, las tres colas con `x-dead-letter-exchange`/`x-dead
 3. *Para pensar:* ¿cuándo preferirías `RejectAndDontRequeueRecoverer`, que envía el mensaje a la DLQ de su cola? ¿Qué pasa si el error no es transitorio?
 
 ### EJ 5.4 · Publisher confirms y returns
-Activa `publisher-confirm-type: correlated`, `publisher-returns` y `template.mandatory`. El publicador devuelve el `CompletableFuture<Confirm>` de `CorrelationData`, y el controlador espera el *ack* antes de responder `202`.
+Activa `publisher-confirm-type=correlated`, `publisher-returns` y `template.mandatory`. El publicador devuelve el `CompletableFuture<Confirm>` de `CorrelationData`, y el controlador espera el *ack* antes de responder `202`.
 
 ### EJ 5.5 · Pruebas de integración
 `RabbitIntegracionTest` levanta RabbitMQ con Testcontainers + `@ServiceConnection` y usa **Awaitility** para las aserciones asíncronas. Cubre la difusión a tres colas, las cancelaciones sin factura, los duplicados y los errores que llegan a la cola de errores. Sin Docker, el test se omite.

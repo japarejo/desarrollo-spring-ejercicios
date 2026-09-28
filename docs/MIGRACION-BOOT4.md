@@ -62,13 +62,9 @@ git switch -c boot4
 ### m4 · Web
 - `@WebMvcTest` pasa a `org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest`.
 - Versionado nativo de la API (sustituye `/api/v1` por una cabecera):
-  ```yaml
-  spring:
-    mvc:
-      apiversion:
-        use:
-          header: API-Version
-        default: 1.0
+  ```properties
+  spring.mvc.apiversion.use.header=API-Version
+  spring.mvc.apiversion.default=1.0
   ```
 - `TestRestTemplate` se sustituye por `RestTestClient` (`@AutoConfigureRestTestClient`).
 - JSP: sin cambios funcionales (Servlet 6.1 y Tomcat 11). JSTL sigue siendo la 3.0.

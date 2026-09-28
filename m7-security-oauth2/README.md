@@ -62,8 +62,8 @@ Usuarios del realm: `ana/ana` (USER) y `admin/admin` (USER, ADMIN). El *mapper* 
       }
   }
   ```
-  ```yaml
-  spring.http.serviceclient.github.base-url: https://api.github.com
+  ```properties
+  spring.http.serviceclient.github.base-url=https://api.github.com
   ```
 - **MFA:** `@EnableMultiFactorAuthentication(authorities = {FactorGrantedAuthority.PASSWORD_AUTHORITY, FactorGrantedAuthority.OTT_AUTHORITY})` con `formLogin()` + `oneTimeTokenLogin()`.
 - **Passkeys (WebAuthn):** `http.webAuthn(w -> w.rpName("Atech").rpId("localhost").allowedOrigins("http://localhost:8080"))`.

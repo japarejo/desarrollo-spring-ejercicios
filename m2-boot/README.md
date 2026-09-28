@@ -26,7 +26,7 @@ curl -X POST localhost:8080/api/reservas -H 'Content-Type: application/json' \
 - *Para pensar:* ¿qué diferencia hay entre `spring.profiles.active`, `spring.profiles.default` y `spring.profiles.group`?
 
 ### EJ 2.3 · Logging estructurado
-Configura `logging.structured.format.console: ecs` en `prod` y observa el JSON. Prueba también `logstash` y `gelf`.
+Configura `logging.structured.format.console=ecs` en `prod` y observa el JSON. Prueba también `logstash` y `gelf`.
 
 ### EJ 2.4 · Actuator y métricas
 1. Expón `health`, `info`, `metrics`, `prometheus` y un endpoint propio.

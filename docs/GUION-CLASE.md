@@ -73,7 +73,7 @@ Todos los bloques de este guión siguen el mismo ciclo. Interiorízalo y no tend
 
 Cuatro reglas que salvan la clase:
 
-1. **Escribe en vivo sólo lo que enseña algo.** Las entidades JPA, los `pom.xml` y los YAML se dan hechos.
+1. **Escribe en vivo sólo lo que enseña algo.** Las entidades JPA, los `pom.xml` y los `application.properties` se dan hechos.
    Lo que se escribe delante es el aspecto, el listener, la `Specification`, la `SecurityFilterChain`.
 2. **Rompe antes de arreglar.** Cada módulo tiene su «rotura provocada» marcada más abajo. El error en
    rojo en pantalla enseña más que tres diapositivas.

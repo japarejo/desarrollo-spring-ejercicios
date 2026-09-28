@@ -189,7 +189,7 @@ Pestañas del IDE:
      dentro.**»
    - «La firma es lo que hace que nuestra API pueda confiar en él **sin llamar a Keycloak en cada
      petición**: se valida con la clave pública del emisor. Por eso `issuer-uri` es toda la configuración
-     que hace falta (ver [`application.yml` líneas 21-24](src/main/resources/application.yml#L21-L24)).»
+     que hace falta (ver [`application.properties` línea 14](src/main/resources/application.properties#L14)).»
 
 5. **❓ Pregunta:** «¿Y si hay que revocar el acceso de alguien ahora mismo?» → Con JWT autocontenidos, hasta
    que caduque, no hay forma directa: por eso los *access token* duran minutos y existen los *refresh
@@ -200,12 +200,11 @@ Pestañas del IDE:
 ## Paso 4 · Login social y alta automática (EJ 7.1) · 40 min
 
 1. **✏️ La configuración, y lo que NO hay que hacer**
-   ([`application.yml` líneas 8-20](src/main/resources/application.yml#L8-L20)):
+   ([`application.properties` líneas 4-12](src/main/resources/application.properties#L4-L12)):
 
-   ```yaml
-   github:
-     client-id: ${GITHUB_CLIENT_ID:configurar-github-client-id}
-     client-secret: ${GITHUB_CLIENT_SECRET:configurar}
+   ```properties
+   spring.security.oauth2.client.registration.github.client-id=${GITHUB_CLIENT_ID:configurar-github-client-id}
+   spring.security.oauth2.client.registration.github.client-secret=${GITHUB_CLIENT_SECRET:configurar}
    ```
 
    **🗣️ Di:** «Variables de entorno, **nunca** el secreto en el repositorio. Y fijaos en que no hay ni una

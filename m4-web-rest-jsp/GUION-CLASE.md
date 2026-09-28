@@ -92,8 +92,8 @@ Pestañas del IDE:
 2. **✏️ La configuración de JSP, en dos sitios y nada más:**
    - [`pom.xml`](pom.xml): `<packaging>war</packaging>`, `tomcat-embed-jasper`, y la API **y** la
      implementación de JSTL 3.0.
-   - [`application.yml` líneas 4-8](src/main/resources/application.yml#L4-L8):
-     `spring.mvc.view.prefix: /WEB-INF/jsp/` y `suffix: .jsp`.
+   - [`application.properties` líneas 2-3](src/main/resources/application.properties#L2-L3):
+     `spring.mvc.view.prefix=/WEB-INF/jsp/` y `spring.mvc.view.suffix=.jsp`.
 
    **🗣️ Explica el `/WEB-INF/`:** «Las JSP van ahí porque **el contenedor no las sirve directamente**. Solo
    se puede llegar a ellas pasando por un controlador. Si las dejáis fuera, cualquiera puede pedirlas por
@@ -236,7 +236,7 @@ Pestañas del IDE:
 3. **🗣️ DTOs, y por qué:** [`ReservaRequest`](src/main/java/com/atech/curso/m4/api/ReservaRequest.java) y
    [`ReservaResponse`](src/main/java/com/atech/curso/m4/api/ReservaResponse.java). «Las entidades **no salen
    del servicio**. Tres razones: no queréis que un `@Column` renombrado rompa el contrato de vuestros
-   clientes; no queréis exponer campos internos; y con `open-in-view: false` serializar una entidad con
+   clientes; no queréis exponer campos internos; y con `open-in-view=false` serializar una entidad con
    relaciones `LAZY` revienta. Fijaos en que esto último es exactamente el N+1 de ayer, disfrazado.»
 
 4. **⌨️ Ahora los errores, en directo, uno por uno.** Proyecta la salida de cada `curl`:
@@ -368,10 +368,10 @@ Pestañas del IDE:
    versiones, rompiendo clientes. `PagedModel` os da la estructura estable `content` + `page`. Spring Data
    avisa de esto por log desde hace varias versiones y casi nadie lo lee.»
 
-5. **✏️ Y el límite:** [`application.yml`](src/main/resources/application.yml),
-   `spring.data.web.pageable.max-page-size: 100`.
+5. **✏️ Y el límite:** [`application.properties` línea 8](src/main/resources/application.properties#L8),
+   `spring.data.web.pageable.max-page-size=100`.
    **❓ Pregunta:** «¿Qué pasa si un cliente pide `?size=1000000`?» → Sin ese límite, se lo lleva todo a
-   memoria. Es una denegación de servicio en una línea de YAML.
+   memoria. Es una denegación de servicio en una línea de configuración.
 
 6. **Ejercicio corto (15 min):** documentar dos operaciones y devolver el listado paginado.
 
@@ -466,5 +466,5 @@ trabajo al día siguiente.
 | La validación no se dispara en la API | Falta `@Valid` en el `@RequestBody` |
 | Los errores del formulario no aparecen | `BindingResult` ausente o no colocado justo detrás del objeto |
 | `@WebMvcTest` falla al arrancar por beans que faltan | Solo carga la capa web: lo demás, con `@MockitoBean` |
-| `LazyInitializationException` al serializar | Se está devolviendo la entidad en vez del DTO (`open-in-view: false`) |
+| `LazyInitializationException` al serializar | Se está devolviendo la entidad en vez del DTO (`open-in-view=false`) |
 | Las tildes salen mal en los errores de la API | `application/problem+json` no declara charset; en los tests se fuerza UTF-8 (ver `ReservaRestControllerTest`) |

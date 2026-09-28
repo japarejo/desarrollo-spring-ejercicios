@@ -20,9 +20,9 @@ Ten preparado:
 
 - Una **terminal con el proyecto** y otra **libre para `curl`**, las dos visibles a la vez.
 - Estas pestañas en el IDE:
-  1. [`src/main/resources/application.yml`](src/main/resources/application.yml)
+  1. [`src/main/resources/application.properties`](src/main/resources/application.properties)
   2. [`src/main/java/com/atech/curso/m2/config/ReservasProperties.java`](src/main/java/com/atech/curso/m2/config/ReservasProperties.java)
-  3. [`src/main/resources/application-dev.yml`](src/main/resources/application-dev.yml) y [`application-prod.yml`](src/main/resources/application-prod.yml)
+  3. [`src/main/resources/application-dev.properties`](src/main/resources/application-dev.properties) y [`application-prod.properties`](src/main/resources/application-prod.properties)
   4. [`src/main/java/com/atech/curso/m2/operacion/SalasHealthIndicator.java`](src/main/java/com/atech/curso/m2/operacion/SalasHealthIndicator.java)
   5. [`src/main/java/com/atech/curso/m2/autoconfig/RelojAutoConfiguration.java`](src/main/java/com/atech/curso/m2/autoconfig/RelojAutoConfiguration.java)
 
@@ -103,7 +103,7 @@ vuelve a aparecer en el paso 6 sin avisar.
    | 34 | `@DefaultValue @Valid Notificaciones`: configuración **anidada** que también se valida. |
    | 41-43 | `salaPermitida(...)`: las propiedades pueden tener lógica; no son un saco de campos. |
 
-2. **🗣️ Insiste en `Duration`:** «`duracion-maxima: 4h` se escribe así en el YAML y llega como `Duration`.
+2. **🗣️ Insiste en `Duration`:** «`atech.reservas.duracion-maxima=4h` se escribe así en `application.properties` y llega como `Duration`.
    También hay `DataSize` (`10MB`) y `Period`. Cada vez que veáis un `int minutos` en una configuración,
    hay un tipo mejor esperando.»
 
@@ -113,7 +113,7 @@ vuelve a aparecer en el paso 6 sin avisar.
    módulo.»
 
 4. **🗣️ El procesador de configuración:** el `pom.xml` incluye `spring-boot-configuration-processor`.
-   **✏️ Demuéstralo:** abre [`application.yml`](src/main/resources/application.yml), ponte en la línea de
+   **✏️ Demuéstralo:** abre [`application.properties`](src/main/resources/application.properties), escribe
    `atech.reservas.` y pulsa `Ctrl+Espacio`: el IDE autocompleta **tus** propiedades y muestra el javadoc del
    `record`. Es la razón práctica de poner comentarios en los parámetros.
 
@@ -158,12 +158,12 @@ vuelve a aparecer en el paso 6 sin avisar.
 ## Paso 4 · Perfiles y logging estructurado (EJ 2.2 y 2.3) · 25 min
 
 1. **✏️ Proyecta los tres ficheros a la vez** (usa la vista dividida del IDE):
-   [`application.yml`](src/main/resources/application.yml),
-   [`application-dev.yml`](src/main/resources/application-dev.yml),
-   [`application-prod.yml`](src/main/resources/application-prod.yml).
+   [`application.properties`](src/main/resources/application.properties),
+   [`application-dev.properties`](src/main/resources/application-dev.properties),
+   [`application-prod.properties`](src/main/resources/application-prod.properties).
 
-   **🗣️ La regla:** «El común arriba, lo que cambia por entorno abajo. Y fijaos en la línea 5 del común:
-   `spring.profiles.default: dev`. No es lo mismo que `active`.»
+   **🗣️ La regla:** «El común arriba, lo que cambia por entorno abajo. Y fijaos en la línea 2 del común:
+   `spring.profiles.default=dev`. No es lo mismo que `active`.»
 
 2. **❓ Pregunta (y esta la respondes tú, porque casi nadie la sabe entera):**
    «¿Diferencia entre `spring.profiles.active`, `spring.profiles.default` y `spring.profiles.group`?»
@@ -180,8 +180,8 @@ vuelve a aparecer en el paso 6 sin avisar.
    **✏️ Señala en el log:** `The following 1 profile is active: "dev"`, el `show-sql` de Hibernate creando
    las tablas y la consola H2 en <http://localhost:8080/h2-console> (JDBC URL `jdbc:h2:mem:testdb`).
 
-4. **🗣️ Explica el perfil `prod` sin arrancarlo todavía** (líneas 3-15 de `application-prod.yml`):
-   PostgreSQL, y `spring.docker.compose.enabled: true`. «Con `spring-boot-docker-compose` en el classpath,
+4. **🗣️ Explica el perfil `prod` sin arrancarlo todavía** (líneas 3-9 de `application-prod.properties`):
+   PostgreSQL, y `spring.docker.compose.enabled=true`. «Con `spring-boot-docker-compose` en el classpath,
    **Boot arranca el `compose.yaml` él solo** y configura usuario, contraseña y URL a partir del servicio.
    No hay que copiar credenciales a ningún sitio.»
 
@@ -193,8 +193,8 @@ vuelve a aparecer en el paso 6 sin avisar.
 
    Verás en el log cómo levanta el contenedor de PostgreSQL antes de crear el `DataSource`.
 
-5. **EJ 2.3 · Logging estructurado.** **✏️ Señala las líneas 18-25** de `application-prod.yml`:
-   `logging.structured.format.console: ecs`. **🗣️ Di:** «En `prod` cada línea de log es un JSON con
+5. **EJ 2.3 · Logging estructurado.** **✏️ Señala las líneas 12-14** de `application-prod.properties`:
+   `logging.structured.format.console=ecs`. **🗣️ Di:** «En `prod` cada línea de log es un JSON con
    `service.name`, `log.level`, `trace.id`... Es lo que espera Elastic. Hay también `logstash` y `gelf`.
    Antes de Boot 3.4 esto eran cien líneas de `logback-spring.xml`.»
 
@@ -270,7 +270,7 @@ Con la aplicación del paso 4 todavía corriendo en `dev`.
    ```
 
 7. **❓ Mientras trabajan, pregunta al aire:** «¿Por qué `management.endpoints.web.exposure.include`
-   ([líneas 26-30 de `application.yml`](src/main/resources/application.yml#L26-L30)) tiene que enumerarlos?»
+   ([línea 15 de `application.properties`](src/main/resources/application.properties#L15)) tiene que enumerarlos?»
    → Porque por defecto solo se expone `health`. Exponer `env` o `heapdump` sin pensarlo es un incidente de
    seguridad. En producción, Actuator va **en otro puerto**, cerrado al exterior (`management.server.port`).
 
@@ -287,8 +287,8 @@ Con la aplicación del paso 4 todavía corriendo en `dev`.
    ```
 
 2. **Mientras compila, los hilos virtuales.** **✏️ Señala
-   [`application.yml` líneas 6-9](src/main/resources/application.yml#L6-L9):**
-   `spring.threads.virtual.enabled: true`. Tres líneas de YAML.
+   [`application.properties` línea 4](src/main/resources/application.properties#L4):**
+   `spring.threads.virtual.enabled=true`. Una línea de configuración.
 
 3. **⌨️ Demuéstralo con una petición que falle** (con la aplicación del paso 4 aún corriendo):
 
@@ -306,7 +306,7 @@ Con la aplicación del paso 4 todavía corriendo en `dev`.
    ```
 
    **🗣️ Dos cosas de golpe:** «Abajo del todo, `VirtualThread.run`: esa petición se ha atendido en un hilo
-   virtual, y lo único que hemos hecho es poner tres líneas de YAML. Y un poco más arriba,
+   virtual, y lo único que hemos hecho es añadir una línea de configuración. Y un poco más arriba,
    `ReservaService$$SpringCGLIB$$0`: **ahí está el proxy del módulo 1**, esta vez el de `@Transactional`.»
 
    **🗣️ Añade el matiz honesto:** «Los hilos virtuales ganan cuando el cuello de botella es esperar
@@ -404,7 +404,7 @@ Con la aplicación del paso 4 todavía corriendo en `dev`.
    - La configuración es código: tiene tipos, se valida y mata el arranque si está mal.
    - Lo que no se puede medir en producción no se puede operar.
 
-4. **Enlaza con el módulo 3:** «Hoy hemos guardado reservas con `ddl-auto: create-drop` y H2, que está muy
+4. **Enlaza con el módulo 3:** «Hoy hemos guardado reservas con `ddl-auto=create-drop` y H2, que está muy
    bien para una demo y es inaceptable en producción. Mañana: entidades de verdad, consultas de verdad,
    transacciones y migraciones.»
 
@@ -428,5 +428,5 @@ son los dos momentos que cambian cómo miran Spring Boot.
 | Las propiedades están a `null` | Falta `@ConfigurationPropertiesScan`/`@EnableConfigurationProperties` | Que el bean exista en el contexto |
 | La validación no salta | Falta `@Validated` o el starter de validación | Prueba con `hasFailed()` en un `ApplicationContextRunner` |
 | `/actuator/xxx` devuelve 404 | No está en `exposure.include` | `curl localhost:8080/actuator` lista los expuestos |
-| El perfil `prod` no levanta PostgreSQL | Docker parado, o `spring.docker.compose.enabled: false` heredado del común | Log de arranque: busca `docker compose` |
+| El perfil `prod` no levanta PostgreSQL | Docker parado, o `spring.docker.compose.enabled=false` heredado del común | Log de arranque: busca `docker compose` |
 | El puerto 8080 está ocupado | Ha quedado una demo anterior viva | `docker compose down` y cierra las terminales del módulo anterior |

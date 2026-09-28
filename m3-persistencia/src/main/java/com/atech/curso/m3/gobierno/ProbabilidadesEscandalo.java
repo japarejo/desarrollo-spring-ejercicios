@@ -5,7 +5,7 @@ import org.springframework.boot.context.properties.bind.DefaultValue;
 
 /**
  * EJ 3.7 - Probabilidad de que estalle cada escándalo <b>en cada nombramiento</b> (entre 0 y 1).
- * Se configuran en {@code application.yml} con el prefijo {@code gobierno.escandalos}.
+ * Se configuran en {@code application.properties} con el prefijo {@code gobierno.escandalos}.
  */
 @ConfigurationProperties("gobierno.escandalos")
 public record ProbabilidadesEscandalo(

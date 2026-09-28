@@ -22,7 +22,7 @@
 
 ### EJ 4.2 · API REST y gestión de errores
 1. CRUD en `/api/v1/reservas` con `ResponseEntity`: `201 Created` + `Location`, `204 No Content` al borrar y `404` si no existe.
-2. Usa DTOs (`ReservaRequest`/`ReservaResponse`); las entidades no salen del servicio (`open-in-view: false`).
+2. Usa DTOs (`ReservaRequest`/`ReservaResponse`); las entidades no salen del servicio (`open-in-view=false`).
 3. Errores en formato **`ProblemDetail`** (RFC 9457) con `@RestControllerAdvice` que extiende `ResponseEntityExceptionHandler`: 404, 422 (regla de negocio) y 400 con el detalle `errores` por campo.
 
 ### EJ 4.3 · Contrato y paginación
@@ -35,9 +35,9 @@
 
 ## Extra Spring Boot 4
 - **Versionado de API** nativo:
-  ```yaml
-  spring.mvc.apiversion.use.header: API-Version
-  spring.mvc.apiversion.default: 1.0
+  ```properties
+  spring.mvc.apiversion.use.header=API-Version
+  spring.mvc.apiversion.default=1.0
   ```
   ```java
   @GetMapping(path = "/{id}", version = "1.0")  ReservaResponse buscarV1(...)

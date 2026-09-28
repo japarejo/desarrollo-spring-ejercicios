@@ -151,7 +151,7 @@ Pestañas del IDE, en orden de uso:
        Organo ..> TipoOrgano : Enumerated STRING
    ```
 
-2. **❓ Gancho:** «En el módulo 2 guardábamos reservas con `ddl-auto: create-drop` y H2 en memoria. ¿Qué
+2. **❓ Gancho:** «En el módulo 2 guardábamos reservas con `ddl-auto=create-drop` y H2 en memoria. ¿Qué
    pasa con los datos al reiniciar?» → Se pierden. «¿Y quién crea las tablas en producción? ¿La aplicación,
    al arrancar, adivinando?» Deja el silencio incómodo un par de segundos.
 
@@ -213,8 +213,8 @@ Pestañas del IDE, en orden de uso:
 
 3. **🗣️ El aviso que hay que dar aquí:** «Spring Data os ahorra escribir el `DAO`. **No os ahorra saber qué
    SQL se ejecuta.** Durante todo el módulo vamos a tener el log de SQL a la vista; en
-   [`application.yml`](src/main/resources/application.yml) está `logging.level.org.hibernate.SQL: debug` y
-   `format_sql: true`.»
+   [`application.properties`](src/main/resources/application.properties) está `logging.level.org.hibernate.SQL=debug` y
+   `spring.jpa.properties.hibernate.format_sql=true`.»
 
 ---
 
@@ -354,7 +354,7 @@ Pestañas del IDE, en orden de uso:
    | Proyecciones | Si solo vas a leer, no cargues entidades. |
 
 7. **🗣️ Cierre del bloque:** «Dos hábitos que os podéis llevar hoy mismo: tener el log de SQL encendido en
-   desarrollo, y poner `default_batch_fetch_size` en vuestro `application.yml` esta misma tarde.»
+   desarrollo, y poner `default_batch_fetch_size` en vuestro `application.properties` esta misma tarde.»
 
 ---
 
@@ -369,7 +369,7 @@ Pestañas del IDE, en orden de uso:
 2. **✏️ Enseña el V2**: una columna nueva, un índice y datos de ejemplo. «Así crece un esquema en
    producción: **añadiendo**, nunca editando lo ya aplicado.»
 
-3. **✏️ Y ahora [`application.yml` línea 8](src/main/resources/application.yml#L8):** `ddl-auto: validate`.
+3. **✏️ Y ahora [`application.properties` línea 4](src/main/resources/application.properties#L4):** `spring.jpa.hibernate.ddl-auto=validate`.
    **🗣️ Di:** «Hibernate ya no crea nada: **comprueba** que el esquema que ha hecho Flyway coincide con las
    entidades. Si no coincide, la aplicación no arranca.»
 
@@ -395,7 +395,7 @@ Pestañas del IDE, en orden de uso:
    ```
 
    **🗣️ Di:** «Ha fallado **al arrancar**, no en producción a las tres de la mañana. Comparadlo con
-   `ddl-auto: update`, que habría añadido la columna en silencio y os habría dejado dos columnas y los datos
+   `ddl-auto=update`, que habría añadido la columna en silencio y os habría dejado dos columnas y los datos
    en la vieja.»
 
    **↩️ Deshaz:**
@@ -688,7 +688,7 @@ README lo explica entero y los tests lo cubren.
 | Síntoma | Causa | Qué decir |
 |---|---|---|
 | `LazyInitializationException` | Se navega a la relación fuera de la transacción | «Provocadlo aposta una vez: es el error que más vais a ver.» Se arregla con `@EntityGraph`, proyección o haciendo el trabajo dentro del servicio |
-| `Schema-validation: missing column` | La entidad y la migración no coinciden | Es `ddl-auto: validate` haciendo su trabajo |
+| `Schema-validation: missing column` | La entidad y la migración no coinciden | Es `ddl-auto=validate` haciendo su trabajo |
 | Flyway: `checksum mismatch` | Han editado una migración ya aplicada | Regla de oro. Para desatascar en clase: `docker compose down -v` |
 | El `record` `@Embeddable` no carga | Hibernate anterior a 6.2 | Comprobar la versión de Boot |
 | El test pasa pero en producción no guarda | El test es `@Transactional` y hace *rollback* | Enseñar la cabecera de `ReservaServiceTest` |

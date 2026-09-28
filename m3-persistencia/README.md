@@ -106,7 +106,7 @@ classDiagram
 | Restricciones únicas | `sala.nombre`, `usuario.email`, `organo.nombre`, `gobierno.legislatura` y el par (`gobierno_id`, `organo_id`) de `nombramiento` |
 
 Las tablas las crea Flyway (`V1` y `V2` para las reservas, `V3` para el gobierno), y Hibernate sólo comprueba que
-coinciden con este diagrama (`ddl-auto: validate`).
+coinciden con este diagrama (`ddl-auto=validate`).
 
 ## Enunciados
 
@@ -133,7 +133,7 @@ Implementa `ReservaSpecs` con criterios combinables (sala, ciudad, estado y rang
 *Test:* `NMasUnoTest`.
 
 ### EJ 3.5 · Esquema con Flyway y transacciones
-1. `V1__esquema_inicial.sql` crea las tablas; `V2__notas_indices_y_datos.sql` añade una columna, un índice y datos de ejemplo. Hibernate sólo **valida** (`ddl-auto: validate`).
+1. `V1__esquema_inicial.sql` crea las tablas; `V2__notas_indices_y_datos.sql` añade una columna, un índice y datos de ejemplo. Hibernate sólo **valida** (`ddl-auto=validate`).
 2. `ReservaService#reservar` aplica las reglas de negocio: fin posterior al inicio, sala y usuario existentes y sin solapes.
 3. `reservarVarias` debe ser **todo o nada**: si falla una reserva, no se guarda ninguna.
 4. `cancelar` usa *dirty checking*, sin llamar a `save`.
@@ -161,13 +161,13 @@ Las entidades son las de la parte inferior del [diagrama del modelo](#modelo): `
 3. Para cada órgano, en orden protocolario: `GeneradorNombresHeroicos` propone un titular, la prensa
    (`DetectorEscandalos`) lo investiga y, si sale limpio, se le nombra.
 
-En cada nombramiento puede estallar un escándalo, con una probabilidad configurable en `application.yml`:
+En cada nombramiento puede estallar un escándalo, con una probabilidad configurable en `application.properties`:
 
 | Excepción | Probabilidad por nombramiento |
 |---|---|
-| `CasoplonException` | `gobierno.escandalos.casoplon: 0.03` |
-| `CutreMasterException` | `gobierno.escandalos.cutre-master: 0.02` |
-| `JoyasOcultasException` | `gobierno.escandalos.joyas-ocultas: 0.01` |
+| `CasoplonException` | `gobierno.escandalos.casoplon=0.03` |
+| `CutreMasterException` | `gobierno.escandalos.cutre-master=0.02` |
+| `JoyasOcultasException` | `gobierno.escandalos.joyas-ocultas=0.01` |
 
 Con 12 órganos, la alternancia sale bien con probabilidad (1 − 0,06)¹² ≈ **47,6 %**. Si estalla un escándalo,
 **se deshace todo**: no hay gobierno nuevo, el saliente sigue vigente y conserva sus titulares.
