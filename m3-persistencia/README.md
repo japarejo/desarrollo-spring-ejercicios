@@ -51,6 +51,104 @@ Implementa `ReservaSpecs` con criterios combinables (sala, ciudad, estado y rang
 ### EJ 3.6 · Pruebas con PostgreSQL real
 Ejecuta las migraciones y las consultas contra PostgreSQL con Testcontainers y `@ServiceConnection`. *Test:* `PostgresRepositoryTest`, que se omite si no hay Docker.
 
+### EJ 3.7 · Transacciones con humor: la alternancia en el gobierno de superhéroes
+
+Un gobierno tiene un titular por cada órgano: la presidencia, dos vicepresidencias, siete ministerios y dos
+secretarías de Estado (catálogo en `V3__gobierno_de_superheroes.sql`). Los titulares son superhéroes con un
+nombre aleatorio de **sustantivo + adjetivo**, sin concordancia: *Vengador Holístico*, *Aguja Dinámico*,
+*Croqueta Termonuclear*…
+
+```
+Organo (nombre, tipo, orden) 1 ── * Nombramiento (titular) * ── 1 Gobierno (legislatura, toma de posesión, cese, vigente)
+```
+
+**La alternancia** (`GobiernoService#alternancia`) cambia el gobierno entero en una sola transacción:
+
+1. El gobierno saliente cesa (*dirty checking*, sin `save`).
+2. Se guarda el gobierno entrante con la legislatura siguiente.
+3. Para cada órgano, en orden protocolario: `GeneradorNombresHeroicos` propone un titular, la prensa
+   (`DetectorEscandalos`) lo investiga y, si sale limpio, se le nombra.
+
+En cada nombramiento puede estallar un escándalo, con una probabilidad configurable en `application.yml`:
+
+| Excepción | Probabilidad por nombramiento |
+|---|---|
+| `CasoplonException` | `gobierno.escandalos.casoplon: 0.03` |
+| `CutreMasterException` | `gobierno.escandalos.cutre-master: 0.02` |
+| `JoyasOcultasException` | `gobierno.escandalos.joyas-ocultas: 0.01` |
+
+Con 12 órganos, la alternancia sale bien con probabilidad (1 − 0,06)¹² ≈ **47,6 %**. Si estalla un escándalo,
+**se deshace todo**: no hay gobierno nuevo, el saliente sigue vigente y conserva sus titulares.
+
+**La trampa:** las tres excepciones heredan de `EscandaloException`, que es **comprobada**. Spring sólo hace
+*rollback* automático con `RuntimeException` y `Error`, así que un `@Transactional` a secas haría **commit de un
+gobierno a medias**. Por eso `alternancia()` lleva `@Transactional(rollbackFor = EscandaloException.class)`.
+`alternanciaSinRollbackFor()` es la versión chapucera, y está para ver qué pasa sin ese atributo.
+
+1. Modela `Organo`, `Gobierno` y `Nombramiento`. Los nombramientos se guardan en cascada con el gobierno.
+2. Escribe los repositorios: el gobierno vigente con sus nombramientos en **una sola consulta** (`@EntityGraph`),
+   el histórico como proyección DTO con `count` y la trayectoria de un superhéroe como proyección por interfaz
+   a partir de los alias de un JPQL.
+3. Implementa `GeneradorNombresHeroicos` y `DetectorEscandalos`. El detector hace **una sola tirada** en [0, 1) y
+   reparte el intervalo entre los tres escándalos, para que cada uno salga exactamente con su probabilidad.
+4. Implementa la alternancia **todo o nada**.
+
+*Tests:* `GeneradorNombresHeroicosTest` y `DetectorEscandalosTest` son unitarios; el segundo comprueba las
+frecuencias con 100 000 tiradas. `GobiernoRepositoriosTest` usa `@DataJpaTest`. `GobiernoServiceTest` no es
+transaccional y sustituye el detector por un mock (`@MockitoBean`) para que el escándalo estalle siempre en el
+quinto nombramiento (Defensa), cuando los cuatro primeros ya se han insertado.
+
+```bash
+./mvnw -pl m3-persistencia test -Dtest='GeneradorNombresHeroicosTest,DetectorEscandalosTest,GobiernoRepositoriosTest,GobiernoServiceTest'
+```
+
+## La aplicación: menú interactivo
+
+`spring-boot:run` abre un menú de texto (`consola/ConsolaInteractiva`) con el que se usan las reservas y el
+gobierno. Cada opción indica qué repositorio o servicio llama, y así se puede seguir en el log el SQL que genera.
+
+```bash
+./mvnw -pl m3-persistencia spring-boot:run      # H2 en memoria; los datos se pierden al salir
+```
+
+| Opción | Qué hace | Qué se ve |
+|---|---|---|
+| 1 | Salas y usuarios | `findAll(Sort)` |
+| 2 | Buscar reservas con filtros opcionales, página a página | Specifications, paginación y `@EntityGraph` en `findAll(spec, pageable)` |
+| 3 | Reservas de un usuario | Consulta derivada con proyección por interfaz |
+| 4 | Ocupación por sala | Proyección DTO con `group by` |
+| 5 · 6 | Nueva reserva y cancelar una reserva | Reglas de negocio transaccionales, solapes y *dirty checking* (un `UPDATE` sin `save`) |
+| 7 · 8 | Gobierno vigente e histórico | `@EntityGraph` sobre una colección, proyección DTO con `count` |
+| 9 | **¡Alternancia!** | Con suerte, un gobierno nuevo; si no, `[ROLLBACK]` y el gobierno de siempre |
+| 10 | Alternancia chapucera | Si estalla un escándalo, `[COMMIT]` de un gobierno a medias |
+| 11 | Trayectoria de un superhéroe | JPQL con `like` y proyección por interfaz |
+| 12 | Ver y ajustar las probabilidades | Probabilidad de éxito de la alternancia, recalculada en caliente |
+| 13 | Generar nombres de superhéroe | El generador, sin base de datos |
+| 14 · 15 | Activar o desactivar las trazas de SQL y de transacciones | `LoggingSystem` cambia el nivel en caliente |
+
+**¿Qué diferencia hay entre la alternancia 9 y la 10?** Ninguna mientras no estalle un escándalo: las dos
+hacen commit del gobierno nuevo completo. La diferencia está en qué hace Spring cuando sale la excepción:
+
+| | 9 · Todo o nada | 10 · Chapucera |
+|---|---|---|
+| Anotación | `@Transactional(rollbackFor = EscandaloException.class)` | `@Transactional` |
+| Si estalla un escándalo | **Rollback**: la base de datos queda igual que antes | **Commit**: gobierno nuevo con los cargos nombrados hasta el escándalo y el saliente cesado |
+
+Para no depender de la suerte, al lanzar una alternancia el menú pregunta en qué órgano quieres **filtrar un
+escándalo a la prensa** (por ejemplo `5`, Defensa): estallará seguro al llegar a él. Después muestra el
+recuento de filas **antes y después**, y el log dice cómo terminó de verdad la transacción (`<<< ROLLBACK` o
+`<<< COMMIT a pesar del escándalo`). Esos avisos los escribe una `TransactionSynchronization` registrada en el
+servicio, que se ejecuta cuando la transacción ya ha terminado. Con la traza de transacciones activa (15)
+aparecen además `Initiating transaction rollback` o `Initiating transaction commit`. Otras formas de arrancar:
+
+```bash
+./mvnw -pl m3-persistencia spring-boot:run -Dspring-boot.run.arguments=--gobierno.semilla=42      # azar reproducible
+./mvnw -pl m3-persistencia spring-boot:run -Dspring-boot.run.arguments=--m3.consola.activa=false  # sin menú: arranca y termina
+```
+
+Los tests desactivan el menú en `src/test/resources/config/application.properties`. Si no, los `@SpringBootTest`
+se quedarían esperando a que alguien tecleara.
+
 ## Extra Spring Boot 4
 - Hibernate 7 / JPA 3.2: prueba `EntityManagerFactory#runInTransaction`/`callInTransaction` y `@EnumeratedValue` para guardar un código en lugar del nombre del *enum*.
 - Starters nuevos: `spring-boot-starter-flyway` para Flyway y `spring-boot-starter-data-jpa-test` para los tests.

@@ -18,7 +18,7 @@ Es el módulo más largo y el que más dudas genera. Dos avisos:
 ## Paso 0 · Antes de entrar en el aula (10 min)
 
 ```bash
-./mvnw -pl m3-persistencia test         # 4 clases; PostgresRepositoryTest se omite si no hay Docker
+./mvnw -pl m3-persistencia test         # 8 clases; PostgresRepositoryTest se omite si no hay Docker
 docker pull postgres:17-alpine          # para el paso 8
 git status --short
 ```
@@ -45,6 +45,7 @@ Pestañas del IDE, en orden de uso:
 | 5 | Specifications (EJ 3.3) | 30 | 3 |
 | 6 | 🔴 El problema N+1 (EJ 3.4) | 35 | 3 |
 | 7 | Flyway y transacciones (EJ 3.5) | 45 | 3 |
+| 7c | *Opcional:* la alternancia de superhéroes (EJ 3.7) | +20 | 3 |
 | 8 | PostgreSQL real con Testcontainers (EJ 3.6) | 15 | 3 |
 | 9 | Cierre del módulo | 10 | 3 |
 
@@ -386,6 +387,100 @@ Pestañas del IDE, en orden de uso:
 
 ---
 
+## Paso 7c · *Opcional:* la alternancia de superhéroes (EJ 3.7) · 20 min
+
+**Si vas bien de tiempo.** Refuerza el paso 7b con un ejemplo que se recuerda y añade la trampa que falta:
+**las excepciones comprobadas no hacen *rollback***. Si vas justo, recórtalo (Anexo A) y déjalo para casa: el
+README lo explica entero y los tests lo cubren.
+
+1. **🗣️ Plantea el escenario (2 min):** «Hay elecciones y cambia el gobierno entero: presidencia, dos
+   vicepresidencias, siete ministerios y dos secretarías de Estado. Los titulares son superhéroes con un nombre
+   aleatorio, como *Vengador Holístico* o *Aguja Dinámico*. Pero en cada nombramiento la prensa investiga, y
+   puede estallar un Casoplón, un CutreMaster o unas Joyas Ocultas.» **❓ «Si estalla en el quinto ministerio,
+   ¿qué queremos que pase con los cuatro primeros?»** → Que no quede nada: ni gobierno nuevo a medias ni el
+   anterior cesado.
+
+2. **⌨️ Arranca la aplicación** (es un menú de texto; no termina hasta que eliges `0`):
+
+   ```bash
+   ./mvnw -pl m3-persistencia spring-boot:run
+   ```
+
+   En el menú: **14** (quita la traza de SQL para que no tape lo demás), **15** (traza de transacciones), **7**
+   (el gobierno vigente) y **9** (alternancia). Cuando pregunte dónde filtrar el escándalo, escribe **5**
+   (Defensa): los cuatro primeros nombramientos se insertan y en el quinto estalla seguro.
+
+   **✏️ Señala en la salida**, de arriba abajo:
+
+   ```
+   Creating new transaction with name [...GobiernoService.alternancia]: PROPAGATION_REQUIRED,ISOLATION_DEFAULT,-com.atech.curso.m3.gobierno.EscandaloException
+    INFO GobiernoService : Cesa el gobierno de la legislatura 1
+    INFO GobiernoService :   1. Presidencia del Gobierno -> Halcón Premium
+    ...
+    WARN GobiernoService :   5. Ministerio de Defensa contra Villanos -> Chancla Dinámico   ¡¡¡ ESCÁNDALO: JoyasOcultasException !!!
+   Initiating transaction rollback
+    WARN GobiernoService : <<< ROLLBACK. Se deshacen el cese del saliente, el INSERT del entrante y sus 4 nombramientos
+     En la base de datos      ANTES   DESPUÉS
+     Legislatura vigente          1         1
+     Filas en gobierno            1         1
+     Filas en nombramiento       12        12
+   ```
+
+   **🗣️ Di:** «Fijaos en el `-EscandaloException` del final de la primera línea: es el `rollbackFor`, que
+   Spring anota como regla de *rollback*. Y los cuatro nombramientos se llegaron a insertar (el servicio hace
+   `flush` a propósito): el *rollback* los ha deshecho, y el recuento lo demuestra.»
+
+3. **✏️ Proyecta [`EscandaloException.java`](src/main/java/com/atech/curso/m3/gobierno/EscandaloException.java)**:
+   `extends Exception`. **❓ «¿Qué hace Spring con una excepción comprobada que sale de un método
+   `@Transactional`?»** Deja que lo discutan. → **Commit.** Por defecto solo hacen *rollback* las
+   `RuntimeException` y los `Error`.
+
+4. **🔴 Demuéstralo con la opción 10** (alternancia chapucera, `@Transactional` sin `rollbackFor`), filtrando
+   otra vez el escándalo en el **5**:
+
+   ```
+   Creating new transaction with name [...alternanciaSinRollbackFor]: PROPAGATION_REQUIRED,ISOLATION_DEFAULT
+   ...
+   Initiating transaction commit
+    WARN GobiernoService : <<< COMMIT a pesar del escándalo (JoyasOcultasException es comprobada y no hay rollbackFor)
+     Filas en gobierno            1         2
+     Filas en nombramiento       12        16
+   Gobierno de la legislatura 2 ... · 4 de 12 cargos  <<< ¡GOBIERNO A MEDIAS!
+   ```
+
+   **❓ Pregunta:** «¿Qué diferencia hay entre la 9 y la 10 si no hay escándalo?» → Ninguna. Por eso este fallo
+   pasa todas las pruebas «felices» y sólo aparece cuando algo va mal.
+
+   Enséñalo también en el histórico (**8**): una legislatura con `4/12 cargos`. **🗣️ Di:** «El país lo gobiernan
+   cuatro superhéroes y nadie sabe por qué. En vuestro código será un pedido sin líneas.»
+
+5. **🔴 Ahora con los tests.** En [`GobiernoService.java`](src/main/java/com/atech/curso/m3/gobierno/GobiernoService.java),
+   cambia `@Transactional(rollbackFor = EscandaloException.class)` de `alternancia()` por `@Transactional` y
+   ejecuta:
+
+   ```bash
+   ./mvnw -pl m3-persistencia test -Dtest=GobiernoServiceTest
+   ```
+
+   Fallan los tres casos de `unEscandaloAMitadDeshaceTodaLaAlternancia` (Casoplón, CutreMaster y Joyas
+   ocultas): `[gobiernos (no debe quedar el entrante)]` esperaba un gobierno menos de los que hay.
+   **✏️ Enseña el test:** el `@MockitoBean` del detector hace que el escándalo estalle siempre en Defensa (el
+   quinto nombramiento), y así el azar deja de molestar.
+
+   **↩️ Deshaz:**
+
+   ```bash
+   git checkout -- m3-persistencia/src/main/java/com/atech/curso/m3/gobierno/GobiernoService.java
+   ```
+
+6. **🗣️ Cierre (1 min), tres reglas:**
+   - Si una excepción comprobada debe deshacer la transacción, **`rollbackFor`**. O conviértela en *unchecked*.
+   - El azar se prueba en dos niveles: **unitario con semilla** para las frecuencias (`DetectorEscandalosTest`,
+     100 000 tiradas) y **mock** para decidir dónde falla la integración (`GobiernoServiceTest`).
+   - `noRollbackFor` existe para el caso contrario: una `RuntimeException` que no debe deshacer nada.
+
+---
+
 ## Paso 8 · PostgreSQL real con Testcontainers (EJ 3.6) · 15 min
 
 1. **⌨️ Con Docker arrancado:**
@@ -455,6 +550,7 @@ Pestañas del IDE, en orden de uso:
 | Paso 8 (Testcontainers) | 15 min | Ejecútalo tú y enseña la cabecera. Es demo, no ejercicio. |
 | Paso 5, ejercicio | 20 min | Proyecta `ReservaSpecs` ya hecho y ejecuta el test. |
 | Paso 7a, puntos 1-3 | 10 min | Da las migraciones por vistas y quédate con `validate` y la regla de oro. |
+| Paso 7c (superhéroes) | 20 min | Es opcional: di solo la regla «comprobada = commit salvo `rollbackFor`» y que lo prueben en casa con el menú. |
 
 **No recortes el paso 6 ni el 7b:** N+1 y transacciones son la razón de ser del módulo.
 
@@ -468,3 +564,6 @@ Pestañas del IDE, en orden de uso:
 | El `record` `@Embeddable` no carga | Hibernate anterior a 6.2 | Comprobar la versión de Boot |
 | El test pasa pero en producción no guarda | El test es `@Transactional` y hace *rollback* | Enseñar la cabecera de `ReservaServiceTest` |
 | `ObjectOptimisticLockingFailureException` inesperada | Dos hilos con la misma entidad | Es una buena noticia: el bloqueo optimista funciona |
+| `spring-boot:run` no termina | Es el menú interactivo (EJ 3.7) | Opción `0`, o arrancar con `-Dspring-boot.run.arguments=--m3.consola.activa=false` |
+| Un `@SpringBootTest` nuevo se queda colgado | Se ha borrado `src/test/resources/config/application.properties` y el menú espera teclado | Restaurarlo: desactiva la consola en los tests |
+| Una excepción comprobada no deshace la transacción | Por defecto solo `RuntimeException` y `Error` hacen *rollback* | `rollbackFor`, paso 7c |

@@ -6,6 +6,9 @@ import java.util.List;
 import com.atech.curso.m3.dominio.EstadoReserva;
 import com.atech.curso.m3.dominio.Reserva;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -24,6 +27,14 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long>, JpaSpec
     @EntityGraph(attributePaths = { "sala", "usuario" })
     @Query("select r from Reserva r where r.estado = :estado")
     List<Reserva> buscarConSalaYUsuario(@Param("estado") EstadoReserva estado);
+
+    /**
+     * EJ 3.4 - El grafo también se puede poner en un método heredado redeclarándolo. Así la búsqueda con
+     * Specifications trae sala y usuario, y se pueden leer fuera de la transacción (lo usa la consola).
+     */
+    @Override
+    @EntityGraph(attributePaths = { "sala", "usuario" })
+    Page<Reserva> findAll(Specification<Reserva> spec, Pageable pageable);
 
     /** EJ 3.2 - JPQL con parámetros con nombre: ¿hay solape en la sala? */
     @Query("""

@@ -14,7 +14,7 @@ Hay un módulo Maven por cada tema del curso, y todos giran en torno al mismo do
 |---|---|---|
 | [`m1-core-aop`](m1-core-aop) | Núcleo de Spring y AOP | IoC/DI por constructor, `@Profile`, `@Primary`/`@Qualifier`, eventos, `@Aspect`, pista de auditoría, auto-invocación, reintentos |
 | [`m2-boot`](m2-boot) | Spring Boot | Starters, `@ConfigurationProperties` con records, perfiles, logging estructurado, Actuator, autoconfiguración propia, Docker Compose, imágenes OCI |
-| [`m3-persistencia`](m3-persistencia) | Spring Data JPA | Entidades y relaciones, `@Embeddable` record, consultas derivadas, JPQL, proyecciones, Specifications, Flyway, transacciones, bloqueo optimista, N+1, Testcontainers |
+| [`m3-persistencia`](m3-persistencia) | Spring Data JPA | Entidades y relaciones, `@Embeddable` record, consultas derivadas, JPQL, proyecciones, Specifications, Flyway, transacciones y `rollbackFor` (la alternancia de un gobierno de superhéroes), bloqueo optimista, N+1, Testcontainers, menú de consola interactivo |
 | [`m4-web-rest-jsp`](m4-web-rest-jsp) | Spring MVC | JSP + JSTL 3.0 + formularios, API REST, `ProblemDetail`, paginación, springdoc/OpenAPI, `@WebMvcTest`, REST Assured |
 | [`m5-amqp`](m5-amqp) | RabbitMQ | Exchanges/colas/DLQ, JSON, consumidores idempotentes, reintentos, `RepublishMessageRecoverer`, publisher confirms, Testcontainers |
 | [`m6-integration`](m6-integration) | Spring Integration | `@MessagingGateway`, JDBC poller, filtro, splitter, router, agregador, HTTP y AMQP salientes, `errorChannel`, `MockIntegrationContext` |
