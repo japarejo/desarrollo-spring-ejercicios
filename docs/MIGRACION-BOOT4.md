@@ -8,13 +8,13 @@ git switch -c boot4
 
 ## 0. Antes de empezar (en 3.5.x)
 
-1. Deja la rama `main` sin avisos de *deprecación* (`./mvnw -Dmaven.compiler.showDeprecation=true compile`). En Boot 4 se eliminan las APIs que ya estaban deprecadas en 3.x.
+1. Deja la rama `main` sin avisos de *deprecación* (`./mvnw "-Dmaven.compiler.showDeprecation=true" compile`). En Boot 4 se eliminan las APIs que ya estaban deprecadas en 3.x.
 2. Asegúrate de que todos los tests pasan (`./mvnw verify`).
 3. Opcional: ejecuta **OpenRewrite**, que automatiza gran parte del trabajo:
    ```bash
    ./mvnw -U org.openrewrite.maven:rewrite-maven-plugin:run \
-     -Drewrite.recipeArtifactCoordinates=org.openrewrite.recipe:rewrite-spring:RELEASE \
-     -Drewrite.activeRecipes=org.openrewrite.java.spring.boot4.UpgradeSpringBoot_4_0
+     "-Drewrite.recipeArtifactCoordinates=org.openrewrite.recipe:rewrite-spring:RELEASE" \
+     "-Drewrite.activeRecipes=org.openrewrite.java.spring.boot4.UpgradeSpringBoot_4_0"
    ```
 
 ## 1. `pom.xml` raíz

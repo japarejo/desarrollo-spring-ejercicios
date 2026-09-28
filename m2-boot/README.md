@@ -4,7 +4,7 @@
 
 ```bash
 ./mvnw -pl m2-boot spring-boot:run                                      # perfil dev (H2)
-./mvnw -pl m2-boot spring-boot:run -Dspring-boot.run.profiles=prod      # PostgreSQL con Docker Compose
+./mvnw -pl m2-boot spring-boot:run "-Dspring-boot.run.profiles=prod"      # PostgreSQL con Docker Compose
 ./mvnw -pl m2-boot spring-boot:build-image                              # imagen OCI con Buildpacks
 curl -X POST localhost:8080/api/reservas -H 'Content-Type: application/json' \
      -d '{"sala":"Turing","usuario":"ana@atech.es","fecha":"2030-01-15","inicio":"09:00","fin":"11:00"}'

@@ -51,7 +51,7 @@ vuelve a aparecer en el paso 6 sin avisar.
 1. **⌨️ Ejecuta esto sin decir lo que va a pasar:**
 
    ```bash
-   ./mvnw -q -pl m2-boot spring-boot:run -Dspring-boot.run.arguments=--atech.reservas.hora-apertura=25
+   ./mvnw -q -pl m2-boot spring-boot:run "-Dspring-boot.run.arguments=--atech.reservas.hora-apertura=25"
    ```
 
 2. **Salida esperada** (proyéctala entera y déjala en pantalla mientras hablas):
@@ -188,7 +188,7 @@ vuelve a aparecer en el paso 6 sin avisar.
    **⌨️ Si tienes tiempo y Docker a mano** (2 min, pero es vistoso):
 
    ```bash
-   ./mvnw -q -pl m2-boot spring-boot:run -Dspring-boot.run.profiles=prod
+   ./mvnw -q -pl m2-boot spring-boot:run "-Dspring-boot.run.profiles=prod"
    ```
 
    Verás en el log cómo levanta el contenedor de PostgreSQL antes de crear el `DataSource`.
@@ -367,7 +367,7 @@ Con la aplicación del paso 4 todavía corriendo en `dev`.
 4. **⌨️ El informe de autoconfiguración** (el momento «ajá» del módulo):
 
    ```bash
-   ./mvnw -q -pl m2-boot spring-boot:run -Dspring-boot.run.arguments=--debug
+   ./mvnw -q -pl m2-boot spring-boot:run "-Dspring-boot.run.arguments=--debug"
    ```
 
    Busca en la salida `CONDITIONS EVALUATION REPORT` y luego, dentro, `RelojAutoConfiguration` y

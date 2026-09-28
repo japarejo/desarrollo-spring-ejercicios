@@ -17,7 +17,7 @@ import org.springframework.retry.annotation.EnableRetry;
 /**
  * Módulo 1: contenedor IoC, inyección de dependencias, perfiles, eventos y AOP.
  *
- * <p>Ejecutar con {@code mvn -pl m1-core-aop spring-boot:run -Dspring-boot.run.profiles=sms}
+ * <p>Ejecutar con {@code mvn -pl m1-core-aop spring-boot:run "-Dspring-boot.run.profiles=sms"}
  * para ver la implementación alternativa de {@code Notificador}.
  */
 @SpringBootApplication

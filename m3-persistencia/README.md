@@ -5,7 +5,7 @@
 ```bash
 ./mvnw -pl m3-persistencia test                        # H2 + (si hay Docker) PostgreSQL con Testcontainers
 docker compose -f m3-persistencia/compose.yaml up -d
-./mvnw -pl m3-persistencia spring-boot:run -Dspring-boot.run.profiles=postgres
+./mvnw -pl m3-persistencia spring-boot:run "-Dspring-boot.run.profiles=postgres"
 ```
 
 ## Modelo
@@ -234,8 +234,8 @@ servicio, que se ejecuta cuando la transacción ya ha terminado. Con la traza de
 aparecen además `Initiating transaction rollback` o `Initiating transaction commit`. Otras formas de arrancar:
 
 ```bash
-./mvnw -pl m3-persistencia spring-boot:run -Dspring-boot.run.arguments=--gobierno.semilla=42      # azar reproducible
-./mvnw -pl m3-persistencia spring-boot:run -Dspring-boot.run.arguments=--m3.consola.activa=false  # sin menú: arranca y termina
+./mvnw -pl m3-persistencia spring-boot:run "-Dspring-boot.run.arguments=--gobierno.semilla=42"      # azar reproducible
+./mvnw -pl m3-persistencia spring-boot:run "-Dspring-boot.run.arguments=--m3.consola.activa=false"  # sin menú: arranca y termina
 ```
 
 Los tests desactivan el menú en `src/test/resources/config/application.properties`. Si no, los `@SpringBootTest`

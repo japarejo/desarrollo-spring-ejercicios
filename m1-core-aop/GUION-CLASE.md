@@ -73,7 +73,7 @@ Pausa de 15 min después del paso 4 o del paso 5, lo que caiga más cerca de la 
 2. **⌨️ Ejecuta ahora con el perfil `sms`:**
 
    ```bash
-   ./mvnw -q -pl m1-core-aop spring-boot:run -Dspring-boot.run.profiles=sms
+   ./mvnw -q -pl m1-core-aop spring-boot:run "-Dspring-boot.run.profiles=sms"
    ```
 
    Salida esperada (proyéctala y léela en voz alta):

@@ -12,7 +12,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
  * <p>Es el modo en que arrancaban las aplicaciones Spring antes de Boot, y sigue siendo útil para
  * entender qué hace realmente {@code SpringApplication.run(...)} por debajo.
  *
- * <p>Ejecutar con: {@code ./mvnw -pl extra-xml-config exec:java -Dexec.mainClass=com.atech.curso.xml.demo.DemoXml}
+ * <p>Ejecutar con: {@code ./mvnw -pl extra-xml-config exec:java "-Dexec.mainClass=com.atech.curso.xml.demo.DemoXml"}
  */
 public final class DemoXml {
 

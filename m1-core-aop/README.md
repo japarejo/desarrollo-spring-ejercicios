@@ -4,7 +4,7 @@
 
 ```bash
 ./mvnw -pl m1-core-aop spring-boot:run                                   # notificador por email
-./mvnw -pl m1-core-aop spring-boot:run -Dspring-boot.run.profiles=sms    # notificador por SMS
+./mvnw -pl m1-core-aop spring-boot:run "-Dspring-boot.run.profiles=sms"    # notificador por SMS
 ./mvnw -pl m1-core-aop test
 ```
 

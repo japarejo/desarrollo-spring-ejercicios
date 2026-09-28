@@ -693,6 +693,7 @@ README lo explica entero y los tests lo cubren.
 | El `record` `@Embeddable` no carga | Hibernate anterior a 6.2 | Comprobar la versión de Boot |
 | El test pasa pero en producción no guarda | El test es `@Transactional` y hace *rollback* | Enseñar la cabecera de `ReservaServiceTest` |
 | `ObjectOptimisticLockingFailureException` inesperada | Dos hilos con la misma entidad | Es una buena noticia: el bloqueo optimista funciona |
-| `spring-boot:run` no termina | Es el menú interactivo (EJ 3.7) | Opción `0`, o arrancar con `-Dspring-boot.run.arguments=--m3.consola.activa=false` |
+| `spring-boot:run` no termina | Es el menú interactivo (EJ 3.7) | Opción `0`, o arrancar con `"-Dspring-boot.run.arguments=--m3.consola.activa=false"` |
+| `Unknown lifecycle phase ".run.profiles=postgres"` | PowerShell parte `-Dspring-boot.run.profiles=postgres` en el primer punto | Entrecomillar el argumento: `"-Dspring-boot.run.profiles=postgres"` |
 | Un `@SpringBootTest` nuevo se queda colgado | Se ha borrado `src/test/resources/config/application.properties` y el menú espera teclado | Restaurarlo: desactiva la consola en los tests |
 | Una excepción comprobada no deshace la transacción | Por defecto solo `RuntimeException` y `Error` hacen *rollback* | `rollbackFor`, paso 7c |

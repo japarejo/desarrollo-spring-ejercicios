@@ -242,13 +242,13 @@ docker compose -f m7-security-oauth2/compose.yaml up -d   # Keycloak  → :8180 
 docker compose -f <módulo>/compose.yaml down              # y bájala al terminar
 
 # Ejecutar y probar
-./mvnw -pl m1-core-aop spring-boot:run -Dspring-boot.run.profiles=sms
+./mvnw -pl m1-core-aop spring-boot:run "-Dspring-boot.run.profiles=sms"
 ./mvnw -pl m3-persistencia test
 ./mvnw -pl m3-persistencia test -Dtest=NMasUnoTest        # un solo test en pantalla
 ./mvnw verify                                             # todo, antes de cada sesión
 
 # Trucos de demostración
-./mvnw -pl m2-boot spring-boot:run -Dspring-boot.run.arguments=--debug   # informe de autoconfiguración
+./mvnw -pl m2-boot spring-boot:run "-Dspring-boot.run.arguments=--debug"   # informe de autoconfiguración
 ```
 
 > En Windows, `mvnw.cmd` en lugar de `./mvnw`. Si en el aula hay máquinas de los dos tipos, proyecta siempre

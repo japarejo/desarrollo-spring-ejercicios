@@ -251,8 +251,7 @@ Pestañas del IDE:
    **Si alguien se atasca**, el desatascador universal de este módulo:
 
    ```bash
-   ./mvnw -q -pl m6-integration spring-boot:run \
-     -Dspring-boot.run.arguments=--logging.level.org.springframework.integration=DEBUG
+   ./mvnw -q -pl m6-integration spring-boot:run "-Dspring-boot.run.arguments=--logging.level.org.springframework.integration=DEBUG"
    ```
 
    **🗣️ «Con el log en DEBUG se ve cada salto entre canales, con su carga y sus cabeceras. En este módulo,

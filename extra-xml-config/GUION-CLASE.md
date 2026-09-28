@@ -18,7 +18,7 @@
 
 ```bash
 ./mvnw -pl extra-xml-config test
-./mvnw -q -pl extra-xml-config exec:java -Dexec.mainClass=com.atech.curso.xml.demo.DemoXml
+./mvnw -q -pl extra-xml-config exec:java "-Dexec.mainClass=com.atech.curso.xml.demo.DemoXml"
 ```
 
 Ten abiertos, **en vista dividida, uno al lado del otro** (es todo el bloque):
@@ -47,7 +47,7 @@ Ten abiertos, **en vista dividida, uno al lado del otro** (es todo el bloque):
 2. **⌨️ Ejecuta el contenedor **sin Spring Boot**:**
 
    ```bash
-   ./mvnw -q -pl extra-xml-config exec:java -Dexec.mainClass=com.atech.curso.xml.demo.DemoXml
+   ./mvnw -q -pl extra-xml-config exec:java "-Dexec.mainClass=com.atech.curso.xml.demo.DemoXml"
    ```
 
    **Salida esperada:**
@@ -133,7 +133,7 @@ Ten abiertos, **en vista dividida, uno al lado del otro** (es todo el bloque):
 3. **⌨️ Ahora arranca:**
 
    ```bash
-   ./mvnw -q -pl extra-xml-config exec:java -Dexec.mainClass=com.atech.curso.xml.demo.DemoXml
+   ./mvnw -q -pl extra-xml-config exec:java "-Dexec.mainClass=com.atech.curso.xml.demo.DemoXml"
    ```
 
    → Falla al arrancar: no encuentra la clase `com.atech.curso.xml.tarifas.TarifaPorHora`.

@@ -49,6 +49,18 @@ Cada módulo contiene:
 
 En Windows (CMD o PowerShell) se usa `mvnw.cmd` en lugar de `./mvnw`: `mvnw.cmd verify`.
 
+> **PowerShell y los `-D`.** PowerShell parte en el primer punto los argumentos que empiezan por `-`:
+> `-Dspring-boot.run.profiles=postgres` le llega a Maven como `-Dspring-boot` y `.run.profiles=postgres`, y
+> falla con `Unknown lifecycle phase ".run.profiles=postgres"`. Por eso en los README y en los guiones esos
+> argumentos van **entre comillas dobles**, que funcionan igual en bash, CMD y PowerShell:
+>
+> ```powershell
+> .\mvnw.cmd -pl m3-persistencia spring-boot:run "-Dspring-boot.run.profiles=postgres"
+> ```
+>
+> Si copias un comando de otro sitio, pon tú las comillas. Los `-Dtest=...` no las necesitan porque el nombre
+> de la propiedad no lleva puntos.
+
 El workflow de GitHub Actions (`.github/workflows/ci.yml`) ejecuta `./mvnw verify` con JDK 21 en cada *push*. Los runners de GitHub tienen Docker, así que allí también se ejecutan los tests de Testcontainers.
 
 ## Puertos y servicios

@@ -6,8 +6,7 @@
 
 ```bash
 ./mvnw -pl extra-xml-config test                       # las tres configuraciones, comparadas
-./mvnw -pl extra-xml-config exec:java \
-  -Dexec.mainClass=com.atech.curso.xml.demo.DemoXml    # el contenedor SIN Spring Boot
+./mvnw -pl extra-xml-config exec:java "-Dexec.mainClass=com.atech.curso.xml.demo.DemoXml"   # el contenedor SIN Spring Boot
 ./mvnw -pl extra-xml-config spring-boot:run            # Boot + @ImportResource (híbrido)
 ```
 
