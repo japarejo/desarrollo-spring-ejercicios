@@ -14,5 +14,5 @@ public interface SalaRepository extends JpaRepository<Sala, Long> {
 
     List<Sala> findByCapacidadGreaterThanEqualOrderByCapacidadAsc(int capacidadMinima);
 
-    List<Sala> findByDireccionCiudadIgnoreCase(String ciudad);
+    List<Sala> findByDireccionCiudadIgnoreCase(String ciudad);    
 }

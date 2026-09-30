@@ -19,7 +19,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 
 /** EJ 3.4 - Medir el problema N+1 con las estadísticas de Hibernate y resolverlo con @EntityGraph. */
-@DataJpaTest(properties = "spring.jpa.properties.hibernate.generate_statistics=true")
+@DataJpaTest(properties = {"spring.jpa.properties.hibernate.generate_statistics=true"})
 class NMasUnoTest {
 
     @Autowired
@@ -43,7 +43,8 @@ class NMasUnoTest {
     @Test
     void consultaDerivadaProvocaNMasUno() {
         List<Reserva> confirmadas = reservas.findByEstado(EstadoReserva.CONFIRMADA);
-        confirmadas.forEach(r -> r.getSala().getNombre());
+        confirmadas.forEach(r -> System.out.println(r.getSala().getNombre()));
+        //System.out.println("Reservas confirmadas: " + confirmadas.size());
 
         // 1 consulta de reservas + 1 por cada sala distinta (Turing, Lovelace, Hopper)
         assertThat(estadisticas.getPrepareStatementCount()).isEqualTo(4);
@@ -53,8 +54,8 @@ class NMasUnoTest {
     void entityGraphLoResuelveConUnaSolaConsulta() {
         List<Reserva> confirmadas = reservas.buscarConSalaYUsuario(EstadoReserva.CONFIRMADA);
         confirmadas.forEach(r -> {
-            r.getSala().getNombre();
-            r.getUsuario().getEmail();
+            System.out.print(r.getSala().getNombre()+" - ");
+            System.out.println(r.getUsuario().getEmail());
         });
 
         assertThat(estadisticas.getPrepareStatementCount()).isEqualTo(1);

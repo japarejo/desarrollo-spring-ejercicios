@@ -20,8 +20,9 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long>, JpaSpec
     /** EJ 3.2 - Consulta derivada con proyección por interfaz. */
     List<ReservaResumen> findByUsuarioEmailOrderByInicioAsc(String email);
 
-    /** EJ 3.4 - Provoca N+1 si después se navega a sala/usuario (relaciones LAZY). */
-    List<Reserva> findByEstado(EstadoReserva estado);
+    /** EJ 3.4 - Provoca N+1 si después se navega a sala/usuario (relaciones LAZY). */    
+    List<Reserva> findByEstado(EstadoReserva estado);    
+
 
     /** EJ 3.4 - Solución: un único SELECT con JOIN gracias al grafo de entidad. */
     @EntityGraph(attributePaths = { "sala", "usuario" })

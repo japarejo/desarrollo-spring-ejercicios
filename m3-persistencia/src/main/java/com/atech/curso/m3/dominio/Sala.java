@@ -1,11 +1,15 @@
 package com.atech.curso.m3.dominio;
 
+import java.util.List;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Transient;
 
 @Entity
 public class Sala {
@@ -19,8 +23,11 @@ public class Sala {
 
     private int capacidad;
 
+    @Transient
+    private int ocupacion;
+
     @Embedded
-    private Direccion direccion;
+    private Direccion direccion;    
 
     protected Sala() {
     }

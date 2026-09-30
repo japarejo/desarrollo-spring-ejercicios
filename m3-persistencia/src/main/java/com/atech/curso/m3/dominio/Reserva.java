@@ -27,7 +27,7 @@ public class Reserva {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY,optional = false)
     @JoinColumn(name = "sala_id")
     private Sala sala;
 
