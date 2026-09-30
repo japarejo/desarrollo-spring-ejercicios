@@ -63,7 +63,7 @@ class SalaWebControllerTest {
 
     @Test
     void nombreDuplicadoEsUnErrorDeCampo() throws Exception {
-        given(salas.existeNombre("Turing")).willReturn(true);
+        given(salas.existeNombre("Turing", null)).willReturn(true);
 
         mvc.perform(post("/salas").param("nombre", "Turing").param("capacidad", "10"))
             .andExpect(view().name("salas/formulario"))
@@ -71,7 +71,18 @@ class SalaWebControllerTest {
     }
 
     @Test
-    void formularioValidoRedirigeConMensajeFlash() throws Exception {
+    void editarUnaSalaConservandoSuNombreNoEsDuplicado() throws Exception {
+        given(salas.existeNombre("Turing", 1L)).willReturn(false);
+        given(salas.guardar(any(SalaForm.class))).willReturn(new Sala("Turing", 14, true));
+
+        mvc.perform(post("/salas").param("id", "1").param("nombre", "Turing").param("capacidad", "14"))
+            .andExpect(status().is3xxRedirection())
+            .andExpect(redirectedUrl("/salas"));
+        verify(salas).existeNombre("Turing", 1L);
+    }
+
+    @Test
+    void formularioValidoRedirigeConMensajeFlash()throws Exception {
         given(salas.guardar(any(SalaForm.class))).willReturn(new Sala("Babbage", 8, false));
 
         mvc.perform(post("/salas").param("nombre", "Babbage").param("capacidad", "8"))

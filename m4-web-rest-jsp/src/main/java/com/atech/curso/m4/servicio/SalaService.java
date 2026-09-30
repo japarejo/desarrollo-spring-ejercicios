@@ -27,8 +27,11 @@ public class SalaService {
         return salas.findById(id).orElseThrow(() -> new RecursoNoEncontradoException("Sala", id));
     }
 
-    public boolean existeNombre(String nombre) {
-        return salas.existsByNombreIgnoreCase(nombre);
+    public boolean existeNombre(String nombre, Long id) {
+        if (id == null) {
+            return salas.existsByNombreIgnoreCase(nombre);
+        }
+        return salas.existsByNombreIgnoreCaseAndIdNot(nombre, id);
     }
 
     @Transactional

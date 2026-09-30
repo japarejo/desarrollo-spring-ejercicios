@@ -19,7 +19,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
  * EJ 4.1 - Controlador MVC clásico con vistas JSP. Patrón Post/Redirect/Get con flash attributes.
  */
 @Controller
-@RequestMapping("/salas")
+@RequestMapping("salas")
 public class SalaWebController {
 
     static final String VISTA_LISTA = "salas/lista";
@@ -56,9 +56,8 @@ public class SalaWebController {
     }
 
     @PostMapping
-    public String guardar(@Valid @ModelAttribute("sala") SalaForm form, BindingResult errores,
-            RedirectAttributes redirect) {
-        if (form.getId() == null && form.getNombre() != null && salas.existeNombre(form.getNombre())) {
+    public String guardar(@Valid @ModelAttribute("sala") SalaForm form, BindingResult errores,  RedirectAttributes redirect) {
+        if (form.getNombre() != null && salas.existeNombre(form.getNombre(), form.getId())) {
             errores.rejectValue("nombre", "sala.nombre.duplicado", "Ya existe una sala con ese nombre");
         }
         if (errores.hasErrors()) {
