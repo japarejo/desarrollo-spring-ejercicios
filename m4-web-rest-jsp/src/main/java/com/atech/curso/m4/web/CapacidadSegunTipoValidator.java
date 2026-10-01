@@ -7,14 +7,17 @@ import jakarta.validation.ConstraintValidatorContext;
 
 import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
 
-/** EJ 4.5 - Implementación de {@link CapacidadSegunTipo}. */
+/**
+ * EJ 4.5 - Implementación de {@link CapacidadSegunTipo}. No decide la regla: la pregunta al dominio
+ * ({@link TipoSala#admite(int)}) y se encarga solo de que el error salga junto al campo del formulario.
+ */
 public class CapacidadSegunTipoValidator implements ConstraintValidator<CapacidadSegunTipo, SalaForm> {
 
     @Override
     public boolean isValid(SalaForm sala, ConstraintValidatorContext context) {
         TipoSala tipo = sala.getTipo();
         // Sin tipo no hay nada que comparar: de ese error ya avisa @NotNull en el campo
-        if (tipo == null || sala.getCapacidad() <= tipo.getCapacidadMaxima()) {
+        if (tipo == null || tipo.admite(sala.getCapacidad())) {
             return true;
         }
         // Parámetro {max} del mensaje (extensión de Hibernate Validator). Solo se pasan datos, no textos:

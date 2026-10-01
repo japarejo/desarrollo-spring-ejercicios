@@ -48,6 +48,13 @@ public class SalaService {
 
     @Transactional
     public Sala guardar(SalaForm form) {
+        // EJ 4.5 - El servicio protege la regla aunque nadie haya validado antes (API, procesos por lotes...).
+        // El formulario ya la comprueba con @CapacidadSegunTipo; esto es la garantía, no el mensaje bonito.
+        TipoSala tipo = form.getTipo();
+        if (tipo != null && !tipo.admite(form.getCapacidad())) {
+            throw new ReglaNegocioException("Una sala de tipo " + tipo + " admite como máximo "
+                    + tipo.getCapacidadMaxima() + " personas");
+        }
         // EJ 4.5 - Los ids que llegan del formulario se convierten en entidades gestionadas
         Set<Equipo> equipamiento = new LinkedHashSet<>(equipos.findAllById(form.getEquipamiento()));
         if (form.getId() == null) {

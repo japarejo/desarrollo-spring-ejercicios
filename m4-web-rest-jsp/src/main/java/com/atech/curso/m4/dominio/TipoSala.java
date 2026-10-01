@@ -22,4 +22,12 @@ public enum TipoSala {
     public int getCapacidadMaxima() {
         return capacidadMaxima;
     }
+
+    /**
+     * EJ 4.5 - La regla de negocio, escrita una sola vez y en el dominio. La usan el servicio (que la hace
+     * cumplir siempre) y el validador del formulario (que la convierte en un error junto al campo).
+     */
+    public boolean admite(int capacidad) {
+        return capacidad <= capacidadMaxima;
+    }
 }

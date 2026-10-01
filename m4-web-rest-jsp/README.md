@@ -39,8 +39,9 @@
 3. Validaciones: `@NotNull` en el tipo, `@NotBlank` + `@Email` en el email y una **restricción propia a nivel de clase**, `@CapacidadSegunTipo`, que cuelga el error del campo `capacidad` y rellena `{max}` en el mensaje.
 4. `lista.jsp`: filtro por tipo con un formulario GET que conserva la opción (`${param.tipo}`), enlaces con `c:url` + `c:param`, un acumulador con `c:set`, `fn:length`, un `c:forEach` anidado para el equipamiento y una cabecera común incluida con `<%@ include %>` (`WEB-INF/jsp/comun/cabecera.jspf`).
 5. Con `open-in-view=false`, carga el equipamiento con `@EntityGraph` para que la JSP no lance `LazyInitializationException`.
+6. La regla del aforo vive en el dominio (`TipoSala.admite`): el validador solo la consulta, y `SalaService.guardar` la hace cumplir con `ReglaNegocioException` aunque nadie haya validado el formulario.
 
-*Solución:* `CapacidadSegunTipo`, `SalaWebController`, `dominio/Equipo`, `dominio/TipoSala` · *Tests:* `SalaWebControllerTest`, `CapacidadSegunTipoValidatorTest`, `SalaRepositoryTest` y los de JSP de `ReservaApiIntegrationTest`.
+*Solución:* `CapacidadSegunTipo`, `SalaWebController`, `SalaService`, `dominio/Equipo`, `dominio/TipoSala` · *Tests:* `SalaWebControllerTest`, `CapacidadSegunTipoValidatorTest`, `SalaServiceTest`, `SalaRepositoryTest` y los de JSP de `ReservaApiIntegrationTest`.
 
 ### EJ 4.6 · Internacionalización (español e inglés)
 1. Lleva **todos** los textos de las JSP a `messages.properties` (español, por defecto) y traduce cada clave en `messages_en.properties`, incluidos los mensajes de validación y el mensaje *flash* (`MessageSource` + el `Locale` que Spring inyecta en el controlador).

@@ -19,7 +19,7 @@
 ## Paso 0 · Antes de entrar en el aula (10 min)
 
 ```bash
-./mvnw -pl m4-web-rest-jsp test        # 5 clases en verde
+./mvnw -pl m4-web-rest-jsp test        # 6 clases en verde
 ./mvnw -q -pl m4-web-rest-jsp spring-boot:run
 ```
 
@@ -240,6 +240,15 @@ Pestañas del IDE:
      `form:errors path="capacidad"` no lo pinta.
    - `return true` si no hay tipo: «Cada restricción comprueba **una** cosa. Del tipo vacío ya avisa
      `@NotNull`; si aquí también fallara, el usuario vería dos errores por el mismo problema.»
+   - `tipo.admite(...)`: el validador **no decide la regla**, se la pregunta al dominio.
+
+   **❓ Pregunta:** «Si mañana creamos salas por la API REST, ¿se cumple esta regla?» → Con solo el validador,
+   no: valida `SalaForm`, que es de la capa web. Por eso la regla vive en
+   [`TipoSala.admite`](src/main/java/com/atech/curso/m4/dominio/TipoSala.java) y
+   [`SalaService.guardar`](src/main/java/com/atech/curso/m4/servicio/SalaService.java) la hace cumplir con
+   `ReglaNegocioException`, igual que `ReservaService` con las fechas.
+   **🗣️ Di:** «La regla se escribe una vez y se comprueba dos: en el formulario, para dar un mensaje amable
+   junto al campo; en el servicio, como garantía. Validar la entrada no es lo mismo que proteger el dominio.»
 
 3. **🗣️ De dónde sale el texto:** el `message` es `{sala.capacidad.segunTipo}` y está en
    [`messages.properties`](src/main/resources/messages.properties). «Spring Boot conecta su `MessageSource`
@@ -283,7 +292,7 @@ Pestañas del IDE:
 7. **⌨️ Criterio de aceptación:**
 
    ```bash
-   ./mvnw -pl m4-web-rest-jsp test -Dtest="SalaWebControllerTest,CapacidadSegunTipoValidatorTest,SalaRepositoryTest"
+   ./mvnw -pl m4-web-rest-jsp test -Dtest="SalaWebControllerTest,CapacidadSegunTipoValidatorTest,SalaServiceTest,SalaRepositoryTest"
    ```
 
    **✏️ Señala** `CapacidadSegunTipoValidatorTest`: «Una restricción propia se prueba **sin Spring**, con
