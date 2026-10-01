@@ -36,11 +36,19 @@
 ### EJ 4.5 · Ampliación: tipo de sala, equipamiento y validación entre campos
 1. Añade a la sala un **tipo** (`enum TipoSala`: reuniones, formación, auditorio, cada uno con su aforo máximo), un **email del responsable** y su **equipamiento**: una entidad `Equipo` relacionada con `@ManyToMany`.
 2. `formulario.jsp`: `form:select` + `form:options` para el tipo y `form:checkboxes` para el equipamiento (el formulario guarda los **ids** marcados). Las opciones llegan al modelo con métodos `@ModelAttribute`.
-3. Validaciones: `@NotNull` en el tipo, `@NotBlank` + `@Email` en el email y una **restricción propia a nivel de clase**, `@CapacidadSegunTipo`, que cuelga el error del campo `capacidad` y rellena `{tipo}` y `{max}` en el mensaje.
+3. Validaciones: `@NotNull` en el tipo, `@NotBlank` + `@Email` en el email y una **restricción propia a nivel de clase**, `@CapacidadSegunTipo`, que cuelga el error del campo `capacidad` y rellena `{max}` en el mensaje.
 4. `lista.jsp`: filtro por tipo con un formulario GET que conserva la opción (`${param.tipo}`), enlaces con `c:url` + `c:param`, un acumulador con `c:set`, `fn:length`, un `c:forEach` anidado para el equipamiento y una cabecera común incluida con `<%@ include %>` (`WEB-INF/jsp/comun/cabecera.jspf`).
 5. Con `open-in-view=false`, carga el equipamiento con `@EntityGraph` para que la JSP no lance `LazyInitializationException`.
 
 *Solución:* `CapacidadSegunTipo`, `SalaWebController`, `dominio/Equipo`, `dominio/TipoSala` · *Tests:* `SalaWebControllerTest`, `CapacidadSegunTipoValidatorTest`, `SalaRepositoryTest` y los de JSP de `ReservaApiIntegrationTest`.
+
+### EJ 4.6 · Internacionalización (español e inglés)
+1. Lleva **todos** los textos de las JSP a `messages.properties` (español, por defecto) y traduce cada clave en `messages_en.properties`, incluidos los mensajes de validación y el mensaje *flash* (`MessageSource` + el `Locale` que Spring inyecta en el controlador).
+2. Configura un `CookieLocaleResolver` (bean `localeResolver`) y un `LocaleChangeInterceptor` con el parámetro `lang`, y añade a la cabecera los enlaces `?lang=es` y `?lang=en`.
+3. Traduce los tipos de sala con claves construidas a partir del enum (`tipo.${t}`) y usa un mensaje con argumentos para el pie de la tabla.
+4. Fija `spring.messages.fallback-to-system-locale=false` para que un idioma sin traducción reciba español y no el idioma del servidor.
+
+*Solución:* `IdiomaConfig`, `messages*.properties`, las JSP · *Tests:* los de idioma de `SalaWebControllerTest` y `laVistaJspSeTraduceAlIngles`.
 
 ## Extra Spring Boot 4
 - **Versionado de API** nativo:

@@ -1,10 +1,17 @@
 <%-- EJ 4.5 - Fragmento común (.jspf). Se incluye con la directiva include: se copia dentro de la JSP al
-     traducirla, así que usa los taglib que declare la página que lo incluye (aquí, "c"). --%>
+     traducirla, así que usa los taglib que declare la página que lo incluye (aquí, "c" y "spring"). --%>
 <header class="cabecera">
-    <strong>Atech &middot; Reservas</strong>
+    <strong><spring:message code="app.nombre"/></strong>
     <nav>
-        <a href="<c:url value='/salas'/>">Salas</a>
-        <a href="<c:url value='/salas/nueva'/>">Nueva sala</a>
-        <a href="<c:url value='/swagger-ui.html'/>">API REST (Swagger UI)</a>
+        <a href="<c:url value='/salas'/>"><spring:message code="nav.salas"/></a>
+        <a href="<c:url value='/salas/nueva'/>"><spring:message code="nav.nueva"/></a>
+        <a href="<c:url value='/swagger-ui.html'/>"><spring:message code="nav.api"/></a>
+    </nav>
+    <%-- EJ 4.6 - ?lang=xx lo recoge el LocaleChangeInterceptor y lo guarda en la cookie "idioma".
+         ${pageContext.response.locale} es el idioma que ha decidido el LocaleResolver para esta petición. --%>
+    <nav class="idiomas">
+        <c:set var="idiomaActual" value="${pageContext.response.locale.language}"/>
+        <a href="?lang=es" class="${idiomaActual == 'es' ? 'activo' : ''}"><spring:message code="idioma.es"/></a>
+        <a href="?lang=en" class="${idiomaActual == 'en' ? 'activo' : ''}"><spring:message code="idioma.en"/></a>
     </nav>
 </header>

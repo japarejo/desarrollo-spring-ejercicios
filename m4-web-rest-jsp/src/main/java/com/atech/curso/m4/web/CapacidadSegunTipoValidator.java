@@ -17,9 +17,9 @@ public class CapacidadSegunTipoValidator implements ConstraintValidator<Capacida
         if (tipo == null || sala.getCapacidad() <= tipo.getCapacidadMaxima()) {
             return true;
         }
-        // Parámetros {tipo} y {max} del mensaje (extensión de Hibernate Validator)
+        // Parámetro {max} del mensaje (extensión de Hibernate Validator). Solo se pasan datos, no textos:
+        // la frase completa se traduce en messages*.properties
         context.unwrap(HibernateConstraintValidatorContext.class)
-            .addMessageParameter("tipo", tipo.getDescripcion())
             .addMessageParameter("max", tipo.getCapacidadMaxima());
         // El error se cuelga del campo "capacidad", no del objeto: así form:errors lo pinta junto al campo
         context.disableDefaultConstraintViolation();

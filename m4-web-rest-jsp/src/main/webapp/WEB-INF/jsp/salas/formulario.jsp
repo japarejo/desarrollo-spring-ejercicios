@@ -3,7 +3,7 @@
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <!DOCTYPE html>
-<html lang="es">
+<html lang="${pageContext.response.locale.language}">
 <head>
     <meta charset="UTF-8">
     <title><spring:message code="sala.formulario"/></title>
@@ -20,40 +20,44 @@
     <form:errors path="*" element="div" cssClass="errores"/>
 
     <p>
-        <form:label path="nombre">Nombre</form:label>
+        <form:label path="nombre"><spring:message code="sala.nombre"/></form:label>
         <form:input path="nombre" cssErrorClass="error"/>
         <form:errors path="nombre" cssClass="error"/>
     </p>
     <p>
-        <%-- EJ 4.5 - form:select + form:options: "tipos" lo pone en el modelo un método @ModelAttribute.
-             Con un enum, el valor de cada opción es name() y la etiqueta, la propiedad itemLabel. --%>
-        <form:label path="tipo">Tipo</form:label>
+        <%-- EJ 4.5 - form:select + form:option: "tipos" lo pone en el modelo un método @ModelAttribute.
+             EJ 4.6 - En vez de form:options con itemLabel, un form:option por tipo con su texto traducido. --%>
+        <form:label path="tipo"><spring:message code="sala.tipo"/></form:label>
         <form:select path="tipo" cssErrorClass="error">
-            <form:option value="" label="-- Elige el tipo --"/>
-            <form:options items="${tipos}" itemLabel="descripcion"/>
+            <form:option value=""><spring:message code="sala.tipo.elegir"/></form:option>
+            <c:forEach var="t" items="${tipos}">
+                <form:option value="${t}"><spring:message code="tipo.${t}"/></form:option>
+            </c:forEach>
         </form:select>
         <form:errors path="tipo" cssClass="error"/>
     </p>
     <p>
-        <form:label path="capacidad">Capacidad</form:label>
+        <form:label path="capacidad"><spring:message code="sala.capacidad"/></form:label>
         <form:input path="capacidad" type="number" cssErrorClass="error"/>
         <%-- EJ 4.5 - Aquí aparece también el error de @CapacidadSegunTipo, aunque se declare en la clase --%>
         <form:errors path="capacidad" cssClass="error"/>
     </p>
     <p>
-        <form:label path="emailResponsable">Email del responsable</form:label>
+        <form:label path="emailResponsable"><spring:message code="sala.emailResponsable"/></form:label>
         <form:input path="emailResponsable" type="email" cssErrorClass="error"/>
         <form:errors path="emailResponsable" cssClass="error"/>
     </p>
     <fieldset>
-        <legend>Equipamiento</legend>
-        <form:checkbox path="proyector" label="Proyector"/>
+        <legend><spring:message code="sala.equipamiento"/></legend>
+        <%-- EJ 4.6 - El atributo label no admite etiquetas dentro: el texto se guarda antes en una variable --%>
+        <spring:message code="sala.proyector" var="textoProyector"/>
+        <form:checkbox path="proyector" label="${textoProyector}"/>
         <%-- EJ 4.5 - form:checkboxes: una casilla por equipo (entidad). itemValue="id" es lo que se envía y
              se compara con los ids del Set<Long> del formulario para marcar las casillas. --%>
         <form:checkboxes path="equipamiento" items="${equipos}" itemValue="id" itemLabel="nombre" element="span"/>
     </fieldset>
-    <button type="submit">Guardar</button>
-    <a href="<c:url value='/salas'/>">Cancelar</a>
+    <button type="submit"><spring:message code="sala.guardar"/></button>
+    <a href="<c:url value='/salas'/>"><spring:message code="sala.cancelar"/></a>
 </form:form>
 </body>
 </html>

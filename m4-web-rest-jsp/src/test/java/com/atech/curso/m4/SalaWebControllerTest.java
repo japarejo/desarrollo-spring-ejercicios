@@ -8,6 +8,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.cookie;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.flash;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.forwardedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
@@ -16,12 +17,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
 import java.util.List;
+import java.util.Locale;
 
 import com.atech.curso.m4.dominio.Sala;
 import com.atech.curso.m4.dominio.TipoSala;
 import com.atech.curso.m4.servicio.SalaService;
 import com.atech.curso.m4.web.SalaForm;
 import com.atech.curso.m4.web.SalaWebController;
+
+import jakarta.servlet.http.Cookie;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -43,6 +47,9 @@ class SalaWebControllerTest {
     @Autowired
     MockMvc mvc;
 
+    // MockMvc envía Locale.ENGLISH si no se indica otro: los tests fijan el idioma que comprueban
+    static final Locale ES = Locale.of("es");
+
     @MockitoBean
     SalaService salas;
 
@@ -52,7 +59,8 @@ class SalaWebControllerTest {
             .param("nombre", nombre)
             .param("tipo", tipo)
             .param("capacidad", String.valueOf(capacidad))
-            .param("emailResponsable", "ana@atech.es");
+            .param("emailResponsable", "ana@atech.es")
+            .locale(ES);
     }
 
     @Test
@@ -80,7 +88,7 @@ class SalaWebControllerTest {
 
     @Test
     void formularioInvalidoVuelveALaVistaConErrores() throws Exception {
-        mvc.perform(post("/salas").param("nombre", "").param("capacidad", "0"))
+        mvc.perform(post("/salas").param("nombre", "").param("capacidad", "0").locale(ES))
             .andExpect(status().isOk())
             .andExpect(view().name("salas/formulario"))
             .andExpect(model().attributeHasFieldErrorCode("sala", "nombre", "NotBlank"))
@@ -108,7 +116,7 @@ class SalaWebControllerTest {
         BindingResult errores = (BindingResult) resultado.getModelAndView().getModel()
             .get(BindingResult.MODEL_KEY_PREFIX + "sala");
         assertThat(errores.getFieldError("capacidad").getDefaultMessage())
-            .isEqualTo("Una sala de tipo Reuniones admite como máximo 20 personas");
+            .isEqualTo("La capacidad máxima para este tipo de sala es 20");
         verify(salas, never()).guardar(any());
     }
 
@@ -160,6 +168,44 @@ class SalaWebControllerTest {
         mvc.perform(postSala("Babbage", "REUNIONES", 8))
             .andExpect(status().is3xxRedirection())
             .andExpect(redirectedUrl("/salas"))
+            .andExpect(flash().attribute("mensaje", "Sala Babbage guardada"));
+    }
+
+    // EJ 4.6 - Internacionalización
+
+    @Test
+    void enInglesElMensajeFlashYLosErroresSeTraducen() throws Exception {
+        given(salas.guardar(any(SalaForm.class))).willReturn(new Sala("Babbage", TipoSala.REUNIONES, 8, false));
+
+        mvc.perform(postSala("Babbage", "REUNIONES", 8).locale(Locale.ENGLISH))
+            .andExpect(flash().attribute("mensaje", "Room Babbage saved"));
+
+        MvcResult resultado = mvc.perform(postSala("Babbage", "REUNIONES", 120).locale(Locale.ENGLISH)).andReturn();
+        BindingResult errores = (BindingResult) resultado.getModelAndView().getModel()
+            .get(BindingResult.MODEL_KEY_PREFIX + "sala");
+        assertThat(errores.getFieldError("capacidad").getDefaultMessage())
+            .isEqualTo("The maximum capacity for this room type is 20");
+    }
+
+    @Test
+    void elParametroLangCambiaElIdiomaYLoGuardaEnUnaCookie() throws Exception {
+        given(salas.guardar(any(SalaForm.class))).willReturn(new Sala("Babbage", TipoSala.REUNIONES, 8, false));
+
+        // Aunque el navegador pida español, ?lang=en manda
+        mvc.perform(postSala("Babbage", "REUNIONES", 8).param("lang", "en"))
+            .andExpect(cookie().value("idioma", "en"))
+            .andExpect(flash().attribute("mensaje", "Room Babbage saved"));
+
+        // Y en las peticiones siguientes manda la cookie
+        mvc.perform(postSala("Babbage", "REUNIONES", 8).cookie(new Cookie("idioma", "en")))
+            .andExpect(flash().attribute("mensaje", "Room Babbage saved"));
+    }
+
+    @Test
+    void unIdiomaSinTraduccionUsaElEspanolYNoElDelServidor() throws Exception {
+        given(salas.guardar(any(SalaForm.class))).willReturn(new Sala("Babbage", TipoSala.REUNIONES, 8, false));
+
+        mvc.perform(postSala("Babbage", "REUNIONES", 8).locale(Locale.GERMAN))
             .andExpect(flash().attribute("mensaje", "Sala Babbage guardada"));
     }
 }

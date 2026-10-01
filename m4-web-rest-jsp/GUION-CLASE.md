@@ -48,6 +48,7 @@ Pestañas del IDE:
 | 3 | Ejercicio EJ 4.1 (vistas y formularios) | 35 | 3 |
 | 4 | Puesta en común + 🔴 Post/Redirect/Get | 15 | 3 |
 | 4 bis | *Opcional:* ampliación EJ 4.5 (tipo, equipamiento, validación entre campos) | 30 | 3 o casa |
+| 4 ter | *Opcional:* internacionalización (EJ 4.6) | 20 | 3 o casa |
 | 5 | Concepto: API REST y errores (EJ 4.2) | 20 | 4 |
 | 6 | Ejercicio EJ 4.2 | 40 | 4 |
 | 7 | Contrato y paginación (EJ 4.3) | 30 | 4 |
@@ -112,8 +113,8 @@ Pestañas del IDE:
    error que no dice nada útil. Apuntadlo.»
 
 4. **✏️ Recorre el cuerpo de la vista** (30 segundos cada cosa): `c:if` con el mensaje *flash* (línea 18),
-   `c:choose`/`c:when` para la lista vacía (37-40), `c:forEach` con `varStatus` (50-52),
-   `fmt:formatNumber` (59) y `c:url` (12, 73), que añade el contexto de la aplicación.
+   `c:choose`/`c:when` para la lista vacía (38-41), `c:forEach` con `varStatus` (53-55),
+   `fmt:formatNumber` (63) y `c:url` (12, 78), que añade el contexto de la aplicación.
 
 ---
 
@@ -134,12 +135,12 @@ Pestañas del IDE:
    arriba. Esto es lo que se pierde cuando se escribe el formulario a mano en HTML.»
 
 2. **✏️ Y el controlador**
-   ([`SalaWebController.java` líneas 82-93](src/main/java/com/atech/curso/m4/web/SalaWebController.java#L82-L93)),
+   ([`SalaWebController.java` líneas 86-100](src/main/java/com/atech/curso/m4/web/SalaWebController.java#L86-L100)),
    señalando el orden de los parámetros:
 
    ```java
    public String guardar(@Valid @ModelAttribute("sala") SalaForm form, BindingResult errores,
-           RedirectAttributes redirect) {
+           RedirectAttributes redirect, Locale idioma) {
    ```
 
    **🗣️ Aviso que salva media hora:** «`BindingResult` **tiene que ir inmediatamente después** del objeto
@@ -170,7 +171,7 @@ Pestañas del IDE:
 
 1. **🔴 La demo del F5** (hazla en el navegador, en directo; dura un minuto y no se olvida):
 
-   **✏️ En [`SalaWebController.java` línea 92](src/main/java/com/atech/curso/m4/web/SalaWebController.java#L92)**,
+   **✏️ En [`SalaWebController.java` línea 99](src/main/java/com/atech/curso/m4/web/SalaWebController.java#L99)**,
    cambia la redirección por una vista directa:
 
    ```java
@@ -190,11 +191,11 @@ Pestañas del IDE:
    ```
 
 2. **❓ Pregunta encadenada:** «Si redirijo, el objeto del modelo se pierde. ¿Cómo enseño entonces el mensaje
-   *Sala guardada*?» → Con `RedirectAttributes.addFlashAttribute` (línea 91): Spring lo guarda en la sesión,
+   *Sala guardada*?» → Con `RedirectAttributes.addFlashAttribute` (líneas 97-98): Spring lo guarda en la sesión,
    lo pone en el modelo de la siguiente petición y **lo borra**. De ahí el nombre.
 
 3. **✏️ Y la validación de negocio**
-   ([líneas 84-86](src/main/java/com/atech/curso/m4/web/SalaWebController.java#L84-L86)):
+   ([líneas 89-91](src/main/java/com/atech/curso/m4/web/SalaWebController.java#L89-L91)):
 
    ```java
    errores.rejectValue("nombre", "sala.nombre.duplicado", "Ya existe una sala con ese nombre");
@@ -225,7 +226,7 @@ Pestañas del IDE:
    tipo en cada fila, el equipamiento y el pie con el aforo total. Luego **edita Turing** (reuniones) y
    ponle 120 plazas:
 
-   > Una sala de tipo Reuniones admite como máximo 20 personas
+   > La capacidad máxima para este tipo de sala es 20
 
    **❓ Pregunta:** «¿En qué campo pondríais `@Max` para esto?» → En ninguno: el máximo **depende de otro
    campo**. Las anotaciones de campo no ven el resto del objeto.
@@ -242,13 +243,14 @@ Pestañas del IDE:
 
 3. **🗣️ De dónde sale el texto:** el `message` es `{sala.capacidad.segunTipo}` y está en
    [`messages.properties`](src/main/resources/messages.properties). «Spring Boot conecta su `MessageSource`
-   con Bean Validation. Los `{tipo}` y `{max}` **no son** los `{0}`, `{1}` de Spring: los rellena el validador
-   con `addMessageParameter`.»
+   con Bean Validation. El `{max}` **no es** un `{0}`, `{1}` de Spring: lo rellena el validador con
+   `addMessageParameter`.» Fíjate en que el validador pasa **un dato** (el número) y no un texto: así la frase
+   entera se puede traducir (paso 4 ter).
 
 4. **✏️ Las etiquetas nuevas del formulario**
    ([`formulario.jsp`](src/main/webapp/WEB-INF/jsp/salas/formulario.jsp)):
-   - `form:select` + `form:options items="${tipos}" itemLabel="descripcion"`: con un enum, el valor es
-     `name()`.
+   - `form:select` + un `form:option` por cada valor de `${tipos}`: con un enum, el valor es `name()` y el
+     texto sale de `messages.properties` (`tipo.REUNIONES`...).
    - `form:checkboxes items="${equipos}" itemValue="id" itemLabel="nombre"`: el formulario guarda un
      `Set<Long>` con los ids, y el servicio los convierte en entidades con `findAllById`.
      **🗣️ Di:** «El formulario no maneja entidades. Si enlazáis directamente un `Set<Equipo>`, necesitáis un
@@ -286,6 +288,63 @@ Pestañas del IDE:
 
    **✏️ Señala** `CapacidadSegunTipoValidatorTest`: «Una restricción propia se prueba **sin Spring**, con
    `Validation.buildDefaultValidatorFactory()`. Milisegundos.»
+
+---
+
+## Paso 4 ter · *Opcional:* internacionalización (EJ 4.6) · 20 min
+
+1. **⌨️ Enséñalo funcionando:** en <http://localhost:8080/salas> pulsa **English** en la cabecera. Cambian
+   los textos, los tipos de sala, los mensajes de validación (prueba otra vez las 120 plazas) y hasta el
+   formato de los números. Recarga la página: **sigue en inglés**. Abre las herramientas del navegador y
+   enseña la cookie `idioma=en`.
+
+2. **✏️ Las dos piezas** ([`IdiomaConfig`](src/main/java/com/atech/curso/m4/web/IdiomaConfig.java)):
+
+   | Pieza | Qué hace |
+   |---|---|
+   | `LocaleResolver` (bean llamado **`localeResolver`**) | Decide el idioma de cada petición: la cookie si existe y, si no, la cabecera `Accept-Language` |
+   | `LocaleChangeInterceptor` | Lee `?lang=en` y se lo pasa al `LocaleResolver`, que lo guarda en la cookie |
+
+   **🗣️ Aviso:** «El bean **tiene que llamarse `localeResolver`**. `DispatcherServlet` lo busca por nombre; si
+   lo llamáis de otra forma no da error, simplemente no se usa.»
+
+3. **✏️ Los ficheros de mensajes:**
+   [`messages.properties`](src/main/resources/messages.properties) (español, el de por defecto) y
+   [`messages_en.properties`](src/main/resources/messages_en.properties). La misma clave en los dos. Tres
+   cosas que enseñar en las vistas:
+   - `<spring:message code="tipo.${t}"/>`: la clave se **construye** con el valor del enum. El enum ya no
+     guarda textos.
+   - El pie de la tabla: `arguments` con `argumentSeparator=";"`. **❓ Pregunta:** «¿Por qué no la coma?» →
+     Porque en inglés el aforo formateado es `1,500`, y se partiría en dos argumentos.
+   - `<spring:message code="sala.proyector" var="textoProyector"/>` antes del `form:checkbox`: el atributo
+     `label` no admite una etiqueta dentro.
+
+4. **🗣️ Qué no se traduce:** los nombres de los equipos. «Son **datos**, están en la base de datos y los da
+   de alta un usuario. Traducir datos es otro problema: una columna por idioma o una tabla de
+   traducciones.»
+
+5. **🔴 Rotura provocada (2 min):** en
+   [`application.properties`](src/main/resources/application.properties) comenta
+   `spring.messages.fallback-to-system-locale=false` y ejecuta:
+
+   ```bash
+   ./mvnw -pl m4-web-rest-jsp test -Dtest=SalaWebControllerTest#unIdiomaSinTraduccionUsaElEspanolYNoElDelServidor
+   ```
+
+   **🗣️ Explica:** «Pido alemán, que no tenemos. Sin esa línea, Spring prueba antes con **el idioma del
+   servidor**. Si el servidor está en inglés, el alemán recibe inglés; si está en español, español. El mismo
+   código se comporta distinto en vuestro portátil y en producción.» En un equipo con Windows en español el
+   test puede pasar igualmente: es justo lo que hace traicionero este fallo.
+
+   **↩️ Deshaz:**
+
+   ```bash
+   git checkout -- m4-web-rest-jsp/src/main/resources/application.properties
+   ```
+
+6. **✏️ Y en los tests:** `SalaWebControllerTest` fija el idioma con `.locale(...)` y
+   `ReservaApiIntegrationTest` con la cabecera `Accept-Language`. **🗣️ Di:** «MockMvc envía `Locale.ENGLISH`
+   si no le decís nada. Un test que compara textos y no fija el idioma acaba fallando en la máquina de otro.»
 
 ---
 
@@ -442,7 +501,7 @@ Pestañas del IDE:
    versiones, rompiendo clientes. `PagedModel` os da la estructura estable `content` + `page`. Spring Data
    avisa de esto por log desde hace varias versiones y casi nadie lo lee.»
 
-5. **✏️ Y el límite:** [`application.properties` línea 9](src/main/resources/application.properties#L9),
+5. **✏️ Y el límite:** [`application.properties` línea 11](src/main/resources/application.properties#L11),
    `spring.data.web.pageable.max-page-size=100`.
    **❓ Pregunta:** «¿Qué pasa si un cliente pide `?size=1000000`?» → Sin ese límite, se lo lleva todo a
    memoria. Es una denegación de servicio en una línea de configuración.
@@ -528,6 +587,7 @@ Pestañas del IDE:
 | Paso 3, edición de salas | 10 min | Que hagan solo el alta; la edición queda de ejercicio. |
 | Paso 8 | 10 min | Ejecuta los dos tests y proyecta la tabla comparativa, sin escribir código. |
 | Paso 4 bis | 30 min | Es opcional: se queda entero para casa (enunciado EJ 4.5 en el README). |
+| Paso 4 ter | 20 min | Igual: para casa (EJ 4.6). Si hay 2 minutos, enseña solo el botón **English**. |
 
 **No recortes el paso 4** (Post/Redirect/Get) **ni el 5** (`ProblemDetail`): son los dos que se llevan al
 trabajo al día siguiente.

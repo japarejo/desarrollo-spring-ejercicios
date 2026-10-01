@@ -13,8 +13,8 @@ import jakarta.validation.Payload;
  * EJ 4.5 - Restricción propia a nivel de clase: la capacidad no puede superar el aforo máximo del tipo de
  * sala. Va en la clase y no en un campo porque necesita ver dos campos a la vez.
  * <p>
- * El mensaje {@code {sala.capacidad.segunTipo}} se busca en messages.properties: Spring Boot conecta su
- * {@code MessageSource} con Bean Validation.
+ * El mensaje {@code {sala.capacidad.segunTipo}} se busca en messages*.properties, en el idioma de la
+ * petición: Spring Boot conecta su {@code MessageSource} con Bean Validation.
  */
 @Documented
 @Target(ElementType.TYPE)

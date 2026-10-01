@@ -2,6 +2,7 @@ package com.atech.curso.m4.web;
 
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 import com.atech.curso.m4.dominio.Equipo;
@@ -11,6 +12,7 @@ import com.atech.curso.m4.servicio.SalaService;
 
 import jakarta.validation.Valid;
 
+import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -33,9 +35,11 @@ public class SalaWebController {
     static final String VISTA_FORM = "salas/formulario";
 
     private final SalaService salas;
+    private final MessageSource mensajes;
 
-    public SalaWebController(SalaService salas) {
+    public SalaWebController(SalaService salas, MessageSource mensajes) {
         this.salas = salas;
+        this.mensajes = mensajes;
     }
 
     // EJ 4.5 - Un método @ModelAttribute se ejecuta antes de CADA handler de este controlador: las opciones
@@ -80,7 +84,8 @@ public class SalaWebController {
     }
 
     @PostMapping
-    public String guardar(@Valid @ModelAttribute("sala") SalaForm form, BindingResult errores,  RedirectAttributes redirect) {
+    public String guardar(@Valid @ModelAttribute("sala") SalaForm form, BindingResult errores,  RedirectAttributes redirect,
+            Locale idioma) {
         if (form.getNombre() != null && salas.existeNombre(form.getNombre(), form.getId())) {
             errores.rejectValue("nombre", "sala.nombre.duplicado", "Ya existe una sala con ese nombre");
         }
@@ -88,7 +93,9 @@ public class SalaWebController {
             return VISTA_FORM;
         }
         Sala sala = salas.guardar(form);
-        redirect.addFlashAttribute("mensaje", "Sala " + sala.getNombre() + " guardada");
+        // EJ 4.6 - Spring inyecta el Locale de la petición (el que decide el LocaleResolver)
+        redirect.addFlashAttribute("mensaje",
+                mensajes.getMessage("sala.guardada", new Object[] { sala.getNombre() }, idioma));
         return "redirect:/salas";
     }
 }

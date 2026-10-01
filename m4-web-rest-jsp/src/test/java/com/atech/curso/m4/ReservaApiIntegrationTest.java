@@ -7,6 +7,7 @@ import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
+import io.restassured.specification.RequestSpecification;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -72,9 +73,14 @@ class ReservaApiIntegrationTest {
                 .body("paths.keySet()", org.hamcrest.Matchers.hasItem("/api/v1/reservas"));
     }
 
+    /** Las JSP salen en el idioma de la petición: los tests lo fijan para no depender del de la máquina. */
+    private static RequestSpecification enEspanol() {
+        return given().header("Accept-Language", "es");
+    }
+
     @Test
     void laVistaJspSeRenderiza() {
-        given().when().get("/salas")
+        enEspanol().when().get("/salas")
             .then().statusCode(200)
                 .contentType(containsString("text/html"))
                 .body(containsString("Turing"))
@@ -84,7 +90,7 @@ class ReservaApiIntegrationTest {
 
     @Test
     void elListadoJspSeFiltraPorTipo() {
-        given().queryParam("tipo", "AUDITORIO").when().get("/salas")
+        enEspanol().queryParam("tipo", "AUDITORIO").when().get("/salas")
             .then().statusCode(200)
                 .body(containsString("Berners-Lee"))
                 .body(org.hamcrest.Matchers.not(containsString("Turing")))
@@ -93,21 +99,31 @@ class ReservaApiIntegrationTest {
 
     @Test
     void elFormularioJspPintaDesplegableYCasillas() {
-        given().when().get("/salas/nueva")
+        enEspanol().when().get("/salas/nueva")
             .then().statusCode(200)
                 .body(containsString("<select id=\"tipo\" name=\"tipo\""))
                 .body(containsString("name=\"equipamiento\""))
-                .body(containsString("Atech &middot; Reservas"));       // cabecera.jspf incluida
+                .body(containsString("Atech · Reservas"));               // cabecera.jspf incluida
     }
 
     @Test
     void alEditarSeMarcanElTipoYElEquipamientoDeLaSala() {
         // Turing (id 1): REUNIONES, con Pizarra (id 1) y Videoconferencia (id 3)
-        given().when().get("/salas/1/editar")
+        enEspanol().when().get("/salas/1/editar")
             .then().statusCode(200)
                 .body(containsString("<option value=\"REUNIONES\" selected=\"selected\""))
                 .body(containsString("value=\"1\" checked=\"checked\""))
                 .body(containsString("value=\"3\" checked=\"checked\""))
                 .body(org.hamcrest.Matchers.not(containsString("value=\"2\" checked=\"checked\"")));
+    }
+
+    @Test
+    void laVistaJspSeTraduceAlIngles() {
+        given().header("Accept-Language", "en").when().get("/salas")
+            .then().statusCode(200)
+                .body(containsString("<html lang=\"en\">"))
+                .body(containsString("Meeting rooms"))
+                .body(containsString("4 rooms · total capacity: 198 people"))
+                .body(containsString(">Auditorium<"));
     }
 }
