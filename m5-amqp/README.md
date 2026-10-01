@@ -5,6 +5,8 @@
 ```bash
 docker compose -f m5-amqp/compose.yaml up -d          # RabbitMQ 4.1 + consola en :15672
 ./mvnw -pl m5-amqp spring-boot:run
+# Publica desde el navegador: http://localhost:8080/swagger-ui.html (ejemplos R-1 y R-400 ya rellenos)
+# o desde la terminal:
 curl -X POST localhost:8080/api/eventos/reservas-confirmadas -H 'Content-Type: application/json' \
   -d '{"reservaId":"R-1","sala":"Turing","usuario":"ana@atech.es","inicio":"2030-01-10T09:00:00","fin":"2030-01-10T11:00:00","importe":30}'
 ```

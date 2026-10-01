@@ -24,12 +24,18 @@
 ```bash
 docker pull rabbitmq:4.1-management
 docker compose -f m5-amqp/compose.yaml up -d
-./mvnw -pl m5-amqp test                 # 3 clases; RabbitIntegracionTest se omite sin Docker
+./mvnw -pl m5-amqp test                 # 4 clases; RabbitIntegracionTest se omite sin Docker
 ```
 
 Comprueba que entras en <http://localhost:15672> y **ten localizadas estas tres pestañas de la consola**:
 *Exchanges*, *Queues and Streams* y, dentro de una cola, el botón **Get messages**. Las vas a usar seis o
 siete veces.
+
+Para publicar eventos no hace falta `curl`: con la aplicación arrancada, **deja abierta
+<http://localhost:8080/swagger-ui.html>** en otra pestaña. La operación `POST /api/eventos/reservas-confirmadas`
+trae ya los dos ejemplos del guion en el desplegable *Examples*: **Reserva válida (R-1)** e **Importe negativo
+(R-400)**. Si el puerto 8080 está ocupado (por ejemplo, por la aplicación del módulo 4), arranca con
+`./mvnw -pl m5-amqp spring-boot:run "-Dspring-boot.run.arguments=--server.port=8085"` y usa ese puerto.
 
 Pestañas del IDE:
 
@@ -79,16 +85,81 @@ Pestañas del IDE:
 
 ## Paso 2 · Concepto: AMQP y la topología en la pizarra · 20 min
 
-1. **Dibuja esto en la pizarra** (tal cual, y no lo borres en las dos sesiones):
+1. **Proyecta este diagrama** (o cópialo en la pizarra) **y déjalo a la vista las dos sesiones**. Es la
+   topología de [`RabbitConfig`](src/main/java/com/atech/curso/m5/config/RabbitConfig.java), tal cual:
 
-   ```
-                              ┌──► reservas.facturacion    ─(DLX)─► reservas.facturacion.dlq
-   publicador ──► reservas.exchange (topic)
-                   reserva.confirmada  ──► reservas.notificaciones ─(DLX)─► ....dlq   [reserva.*]
-                                       ──► reservas.auditoria      ─(DLX)─► ....dlq   [reserva.#]
+   ```mermaid
+   flowchart LR
+       pub(["PublicadorReservas"])
+       ex{{"reservas.exchange<br/><b>topic</b>"}}
 
-   reservas.dlx (direct) ── error ──► reservas.errores   (los que agotan los reintentos)
+       subgraph trabajo ["Colas de trabajo"]
+           direction TB
+           fact["reservas.facturacion"]
+           notif["reservas.notificaciones"]
+           audi["reservas.auditoria"]
+       end
+
+       subgraph consumidores ["Consumidores (@RabbitListener)"]
+           direction TB
+           lfact(["FacturacionListener"])
+           lnotif(["NotificacionesListener"])
+           laudi(["AuditoriaListener"])
+       end
+
+       dlx{{"reservas.dlx<br/><b>direct</b>"}}
+
+       subgraph problemas ["Mensajes con problemas"]
+           direction TB
+           err["reservas.errores"]
+           dfact["reservas.facturacion.dlq"]
+           dnotif["reservas.notificaciones.dlq"]
+           daudi["reservas.auditoria.dlq"]
+       end
+
+       pub -- "reserva.confirmada<br/>reserva.cancelada" --> ex
+       ex -- "reserva.confirmada" --> fact
+       ex -- "reserva.*" --> notif
+       ex -- "reserva.#" --> audi
+       fact --> lfact
+       notif --> lnotif
+       audi --> laudi
+
+       lfact -. "reintentos agotados" .-> dlx
+       lnotif -.-> dlx
+       laudi -.-> dlx
+       fact -. "dead-letter" .-> dlx
+       notif -.-> dlx
+       audi -.-> dlx
+
+       dlx -- "error" --> err
+       dlx -- "#60;cola#62;.dlq" --> dfact
+       dlx --> dnotif
+       dlx --> daudi
+
+       classDef exchange fill:#f3e8ff,stroke:#7e3fa0,stroke-width:2px,color:#2d2a32
+       classDef cola fill:#e8f1fb,stroke:#2f6db5,color:#1b2b40
+       classDef consumidor fill:#eaf6ee,stroke:#1b7f3b,color:#14361f
+       classDef problema fill:#fdecec,stroke:#b00020,color:#4a0d16
+       classDef productor fill:#fff6e0,stroke:#b07800,color:#3d2c00
+       class ex,dlx exchange
+       class fact,notif,audi cola
+       class lfact,lnotif,laudi consumidor
+       class err,dfact,dnotif,daudi problema
+       class pub productor
+       style trabajo fill:none,stroke:#2f6db5,stroke-dasharray:4 3
+       style consumidores fill:none,stroke:#1b7f3b,stroke-dasharray:4 3
+       style problemas fill:none,stroke:#b00020,stroke-dasharray:4 3
    ```
+
+   Cómo leerlo: las flechas continuas son el camino normal y las punteadas, el de los mensajes con
+   problemas. La etiqueta de cada flecha que sale de `reservas.exchange` es el **patrón del binding**. Las
+   dos salidas hacia `reservas.dlx` son distintas y conviene distinguirlas desde ya (se ven a fondo en el
+   paso 5):
+   - **Reintentos agotados:** el *listener* falla 3 veces y `RepublishMessageRecoverer` lo republica con la
+     clave `error`, que lo lleva a `reservas.errores` con la traza en las cabeceras.
+   - **Dead-letter de la cola:** el broker lo saca de la cola (rechazo sin reencolar, TTL...) y lo envía a
+     su DLQ con la clave `<cola>.dlq`.
 
 2. **🗣️ El vocabulario, con el dibujo delante** (cinco palabras y ni una más):
    - **Exchange:** a quien publicas. **Nunca publicas a una cola.**
@@ -172,15 +243,24 @@ Pestañas del IDE:
 
 ## Paso 4 · Productor y consumidores (EJ 5.2) · 25 min
 
-1. **⌨️ Con la aplicación arrancada, publica un evento desde otra terminal:**
+1. **⌨️ Con la aplicación arrancada, publica un evento desde Swagger UI**
+   (<http://localhost:8080/swagger-ui.html>): abre `POST /api/eventos/reservas-confirmadas`, elige el ejemplo
+   **Reserva válida (R-1)** en *Examples* y pulsa **Execute**.
+
+   **Salida esperada:** `202` con `Evento confirmado por el broker` en el cuerpo de la respuesta, y en el log
+   de la aplicación, la factura emitida y la notificación. Pon el navegador y el log uno al lado del otro.
+
+   <details><summary>Lo mismo con <code>curl</code>, si lo prefieres</summary>
 
    ```bash
    curl -X POST localhost:8080/api/eventos/reservas-confirmadas -H 'Content-Type: application/json' \
      -d '{"reservaId":"R-1","sala":"Turing","usuario":"ana@atech.es","inicio":"2030-01-10T09:00:00","fin":"2030-01-10T11:00:00","importe":30}'
    ```
 
-   **Salida esperada:** `Evento confirmado por el broker` (el `202`), y en el log de la aplicación, la
-   factura emitida y la notificación.
+   </details>
+
+   **🗣️ De paso:** «Fijaos en el `202 Accepted` y no `201` ni `200`: el broker ha **aceptado** el mensaje, pero
+   nadie lo ha procesado todavía. La respuesta HTTP llega antes que la factura.»
 
 2. **✏️ Ve a la consola** → cola `reservas.auditoria` → *Get messages* → *Ack mode: Nack message requeue
    true* → *Get Message(s)*. **Proyecta el payload**: es JSON, y en *Properties* están `message_id`,
@@ -216,7 +296,7 @@ Pestañas del IDE:
    consumidor procesa el mensaje y se cae justo antes de hacer el *ack*, el mensaje **se vuelve a entregar**.
    Eso no es un fallo del broker: es su diseño. La unicidad la ponéis vosotros.»
 
-   **⌨️ Demuéstralo publicando dos veces el mismo `curl` del punto 1.** En el log aparece
+   **⌨️ Demuéstralo pulsando otra vez *Execute* con el ejemplo R-1 del punto 1.** En el log aparece
    `Duplicado ignorado: R-1` y **no** se emite una segunda factura.
 
    **❓ Pregunta abierta (vale la pena dedicarle 3 minutos):** «¿Cuál sería la clave de idempotencia en
@@ -254,12 +334,21 @@ Pestañas del IDE:
    capricho: si el fallo es que la base de datos está saturada, reintentar de inmediato **empeora** la
    saturación.»
 
-3. **⌨️ Provoca el error, con la aplicación arrancada** (un importe negativo simula un fallo de negocio):
+3. **⌨️ Provoca el error, con la aplicación arrancada** (un importe negativo simula un fallo de negocio): en
+   Swagger UI, elige el ejemplo **Importe negativo (R-400)** y pulsa **Execute**.
+
+   **❓ Pregunta antes de mirar el log:** «La respuesta es `202`. ¿Ha ido bien?» → Para el broker, sí: ha
+   recibido el mensaje. El fallo ocurre **después**, en el consumidor, y el productor no se entera. Esa es la
+   esencia de la mensajería asíncrona.
+
+   <details><summary>Con <code>curl</code></summary>
 
    ```bash
    curl -X POST localhost:8080/api/eventos/reservas-confirmadas -H 'Content-Type: application/json' \
      -d '{"reservaId":"R-400","sala":"Turing","usuario":"ana@atech.es","inicio":"2030-01-10T09:00:00","fin":"2030-01-10T11:00:00","importe":-5}'
    ```
+
+   </details>
 
 4. **✏️ Enseña el log:** tres intentos de facturación, con las esperas entre ellos, y luego el mensaje
    republicado.
@@ -300,7 +389,7 @@ Pestañas del IDE:
    return new Jackson2JsonMessageConverter(objectMapper);   // sin "com.atech.curso.m5.eventos"
    ```
 
-   **⌨️ Reinicia y vuelve a publicar el `curl` del paso 4.** Facturación y notificaciones **siguen
+   **⌨️ Reinicia y vuelve a publicar el ejemplo R-1 desde Swagger UI.** Facturación y notificaciones **siguen
    funcionando**; auditoría falla y su mensaje acaba en `reservas.errores` con
    `is not in the trusted packages`.
 
@@ -341,7 +430,7 @@ Pestañas del IDE:
    el `CorrelationData` y el `CompletableFuture<Confirm>` que devuelve.
 
    **✏️ Y el controlador**
-   ([`ReservaEventosController` líneas 27-33](src/main/java/com/atech/curso/m5/productor/ReservaEventosController.java#L27-L33)):
+   ([`ReservaEventosController` líneas 61-67](src/main/java/com/atech/curso/m5/productor/ReservaEventosController.java#L61-L67)):
 
    ```java
    CorrelationData.Confirm confirm = publicador.publicar(evento).get(5, TimeUnit.SECONDS);
