@@ -19,7 +19,7 @@
 ## Paso 0 · Antes de entrar en el aula (10 min)
 
 ```bash
-./mvnw -pl m4-web-rest-jsp test        # 3 clases en verde
+./mvnw -pl m4-web-rest-jsp test        # 5 clases en verde
 ./mvnw -q -pl m4-web-rest-jsp spring-boot:run
 ```
 
@@ -47,6 +47,7 @@ Pestañas del IDE:
 | 2 | Concepto: MVC y configuración de JSP | 15 | 3 |
 | 3 | Ejercicio EJ 4.1 (vistas y formularios) | 35 | 3 |
 | 4 | Puesta en común + 🔴 Post/Redirect/Get | 15 | 3 |
+| 4 bis | *Opcional:* ampliación EJ 4.5 (tipo, equipamiento, validación entre campos) | 30 | 3 o casa |
 | 5 | Concepto: API REST y errores (EJ 4.2) | 20 | 4 |
 | 6 | Ejercicio EJ 4.2 | 40 | 4 |
 | 7 | Contrato y paginación (EJ 4.3) | 30 | 4 |
@@ -99,7 +100,7 @@ Pestañas del IDE:
    se puede llegar a ellas pasando por un controlador. Si las dejáis fuera, cualquiera puede pedirlas por
    URL y saltarse vuestra lógica.»
 
-3. **✏️ Proyecta [`lista.jsp` líneas 1-5](src/main/webapp/WEB-INF/jsp/salas/lista.jsp#L1-L5)** y señala el
+3. **✏️ Proyecta [`lista.jsp` líneas 1-6](src/main/webapp/WEB-INF/jsp/salas/lista.jsp#L1-L6)** y señala el
    detalle que hace perder más tiempo:
 
    ```jsp
@@ -110,16 +111,16 @@ Pestañas del IDE:
    todos los URI. **Todos los ejemplos que encontréis en internet están con el URI antiguo** y fallan con un
    error que no dice nada útil. Apuntadlo.»
 
-4. **✏️ Recorre el cuerpo de la vista** (30 segundos cada cosa): `c:if` con el mensaje *flash* (línea 16),
-   `c:choose`/`c:when` para la lista vacía (20-24), `c:forEach` con `varStatus` (30-31),
-   `fmt:formatNumber` (33) y `c:url` (11, 35), que añade el contexto de la aplicación.
+4. **✏️ Recorre el cuerpo de la vista** (30 segundos cada cosa): `c:if` con el mensaje *flash* (línea 18),
+   `c:choose`/`c:when` para la lista vacía (37-40), `c:forEach` con `varStatus` (50-52),
+   `fmt:formatNumber` (59) y `c:url` (12, 73), que añade el contexto de la aplicación.
 
 ---
 
 ## Paso 3 · Ejercicio EJ 4.1 (vistas y formularios) · 35 min
 
 1. **✏️ Antes de soltarlos, proyecta
-   [`formulario.jsp` líneas 16-29](src/main/webapp/WEB-INF/jsp/salas/formulario.jsp#L16-L29)** y explica las
+   [`formulario.jsp` líneas 18-26](src/main/webapp/WEB-INF/jsp/salas/formulario.jsp#L18-L26)** y explica las
    etiquetas `form:` de Spring:
 
    ```jsp
@@ -133,7 +134,7 @@ Pestañas del IDE:
    arriba. Esto es lo que se pierde cuando se escribe el formulario a mano en HTML.»
 
 2. **✏️ Y el controlador**
-   ([`SalaWebController.java` líneas 58-70](src/main/java/com/atech/curso/m4/web/SalaWebController.java#L58-L70)),
+   ([`SalaWebController.java` líneas 82-93](src/main/java/com/atech/curso/m4/web/SalaWebController.java#L82-L93)),
    señalando el orden de los parámetros:
 
    ```java
@@ -169,7 +170,7 @@ Pestañas del IDE:
 
 1. **🔴 La demo del F5** (hazla en el navegador, en directo; dura un minuto y no se olvida):
 
-   **✏️ En [`SalaWebController.java` línea 69](src/main/java/com/atech/curso/m4/web/SalaWebController.java#L69)**,
+   **✏️ En [`SalaWebController.java` línea 92](src/main/java/com/atech/curso/m4/web/SalaWebController.java#L92)**,
    cambia la redirección por una vista directa:
 
    ```java
@@ -189,11 +190,11 @@ Pestañas del IDE:
    ```
 
 2. **❓ Pregunta encadenada:** «Si redirijo, el objeto del modelo se pierde. ¿Cómo enseño entonces el mensaje
-   *Sala guardada*?» → Con `RedirectAttributes.addFlashAttribute` (línea 68): Spring lo guarda en la sesión,
+   *Sala guardada*?» → Con `RedirectAttributes.addFlashAttribute` (línea 91): Spring lo guarda en la sesión,
    lo pone en el modelo de la siguiente petición y **lo borra**. De ahí el nombre.
 
 3. **✏️ Y la validación de negocio**
-   ([líneas 61-63](src/main/java/com/atech/curso/m4/web/SalaWebController.java#L61-L63)):
+   ([líneas 84-86](src/main/java/com/atech/curso/m4/web/SalaWebController.java#L84-L86)):
 
    ```java
    errores.rejectValue("nombre", "sala.nombre.duplicado", "Ya existe una sala con ese nombre");
@@ -212,6 +213,79 @@ Pestañas del IDE:
 
 4. **🗣️ Cierra la sesión 3** con el puente: «Mañana, la misma funcionalidad para un cliente que no es una
    persona. Y veremos que la mitad de las decisiones son las mismas y la otra mitad, muy distintas.»
+
+---
+
+## Paso 4 bis · *Opcional:* ampliación EJ 4.5 · 30 min
+
+> Úsalo si el grupo va rápido o tiene JSP en producción; si no, déjalo para casa. El enunciado está en el
+> README.
+
+1. **⌨️ Enséñalo funcionando** en <http://localhost:8080/salas>: el desplegable de filtro, los enlaces del
+   tipo en cada fila, el equipamiento y el pie con el aforo total. Luego **edita Turing** (reuniones) y
+   ponle 120 plazas:
+
+   > Una sala de tipo Reuniones admite como máximo 20 personas
+
+   **❓ Pregunta:** «¿En qué campo pondríais `@Max` para esto?» → En ninguno: el máximo **depende de otro
+   campo**. Las anotaciones de campo no ven el resto del objeto.
+
+2. **✏️ La restricción de clase**
+   ([`CapacidadSegunTipo`](src/main/java/com/atech/curso/m4/web/CapacidadSegunTipo.java) y
+   [`CapacidadSegunTipoValidator`](src/main/java/com/atech/curso/m4/web/CapacidadSegunTipoValidator.java)).
+   Señala tres cosas:
+   - `@Target(TYPE)` y `@CapacidadSegunTipo` encima de `SalaForm`: valida el objeto entero.
+   - `addPropertyNode("capacidad")`: **cuelga el error del campo**. Sin esa línea, el error es global y
+     `form:errors path="capacidad"` no lo pinta.
+   - `return true` si no hay tipo: «Cada restricción comprueba **una** cosa. Del tipo vacío ya avisa
+     `@NotNull`; si aquí también fallara, el usuario vería dos errores por el mismo problema.»
+
+3. **🗣️ De dónde sale el texto:** el `message` es `{sala.capacidad.segunTipo}` y está en
+   [`messages.properties`](src/main/resources/messages.properties). «Spring Boot conecta su `MessageSource`
+   con Bean Validation. Los `{tipo}` y `{max}` **no son** los `{0}`, `{1}` de Spring: los rellena el validador
+   con `addMessageParameter`.»
+
+4. **✏️ Las etiquetas nuevas del formulario**
+   ([`formulario.jsp`](src/main/webapp/WEB-INF/jsp/salas/formulario.jsp)):
+   - `form:select` + `form:options items="${tipos}" itemLabel="descripcion"`: con un enum, el valor es
+     `name()`.
+   - `form:checkboxes items="${equipos}" itemValue="id" itemLabel="nombre"`: el formulario guarda un
+     `Set<Long>` con los ids, y el servicio los convierte en entidades con `findAllById`.
+     **🗣️ Di:** «El formulario no maneja entidades. Si enlazáis directamente un `Set<Equipo>`, necesitáis un
+     `Formatter` que vaya a la base de datos, y además `equals`/`hashCode` en la entidad para que se marquen
+     las casillas.»
+   - Los métodos `@ModelAttribute("tipos")` y `@ModelAttribute("equipos")` del controlador.
+     **❓ Pregunta:** «¿Por qué no hago `model.addAttribute("tipos", ...)` en `nueva()`?» → Porque cuando el
+     POST falla y vuelve al formulario, el desplegable saldría vacío. El método `@ModelAttribute` se ejecuta
+     antes de **todos** los handlers.
+
+5. **✏️ El JSTL nuevo del listado** ([`lista.jsp`](src/main/webapp/WEB-INF/jsp/salas/lista.jsp)): el filtro
+   GET con `${param.tipo}`, `c:url` + `c:param`, el acumulador con `c:set`, `fn:length` (taglib
+   `jakarta.tags.functions`), el `c:forEach` anidado con `varStatus.last` y el
+   `<%@ include file="/WEB-INF/jsp/comun/cabecera.jspf" %>`.
+   **🗣️ La diferencia de include:** «`<%@ include %>` copia el fragmento al traducir la JSP: comparte
+   variables y taglibs. `<jsp:include>` o `c:import` lo ejecutan en cada petición, como una página aparte.»
+
+6. **🔴 Rotura provocada (2 min):** en
+   [`SalaRepository`](src/main/java/com/atech/curso/m4/dominio/SalaRepository.java) comenta el
+   `@EntityGraph` de `findAllByOrderByNombreAsc` y recarga `/salas`: `LazyInitializationException` **dentro
+   de la JSP**. «Es lo mismo que pasaba con la API y las entidades: con `open-in-view=false`, lo que la vista
+   necesita tiene que venir cargado del servicio.»
+
+   **↩️ Deshaz:**
+
+   ```bash
+   git checkout -- m4-web-rest-jsp/src/main/java/com/atech/curso/m4/dominio/SalaRepository.java
+   ```
+
+7. **⌨️ Criterio de aceptación:**
+
+   ```bash
+   ./mvnw -pl m4-web-rest-jsp test -Dtest="SalaWebControllerTest,CapacidadSegunTipoValidatorTest,SalaRepositoryTest"
+   ```
+
+   **✏️ Señala** `CapacidadSegunTipoValidatorTest`: «Una restricción propia se prueba **sin Spring**, con
+   `Validation.buildDefaultValidatorFactory()`. Milisegundos.»
 
 ---
 
@@ -368,7 +442,7 @@ Pestañas del IDE:
    versiones, rompiendo clientes. `PagedModel` os da la estructura estable `content` + `page`. Spring Data
    avisa de esto por log desde hace varias versiones y casi nadie lo lee.»
 
-5. **✏️ Y el límite:** [`application.properties` línea 8](src/main/resources/application.properties#L8),
+5. **✏️ Y el límite:** [`application.properties` línea 9](src/main/resources/application.properties#L9),
    `spring.data.web.pageable.max-page-size=100`.
    **❓ Pregunta:** «¿Qué pasa si un cliente pide `?size=1000000`?» → Sin ese límite, se lo lleva todo a
    memoria. Es una denegación de servicio en una línea de configuración.
@@ -453,6 +527,7 @@ Pestañas del IDE:
 | Paso 7, ejercicio | 15 min | Enseña Swagger UI funcionando y deja documentar para casa. |
 | Paso 3, edición de salas | 10 min | Que hagan solo el alta; la edición queda de ejercicio. |
 | Paso 8 | 10 min | Ejecuta los dos tests y proyecta la tabla comparativa, sin escribir código. |
+| Paso 4 bis | 30 min | Es opcional: se queda entero para casa (enunciado EJ 4.5 en el README). |
 
 **No recortes el paso 4** (Post/Redirect/Get) **ni el 5** (`ProblemDetail`): son los dos que se llevan al
 trabajo al día siguiente.

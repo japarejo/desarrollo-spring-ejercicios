@@ -5,4 +5,10 @@ th, td { padding: .4rem .8rem; border-bottom: 1px solid #ddd; text-align: left; 
 tr.par { background: #f7f2f8; }
 .ok { color: #1b7f3b; }
 .error, .errores { color: #b00020; }
-input.error { border: 1px solid #b00020; }
+input.error, select.error { border: 1px solid #b00020; }
+.cabecera { display: flex; gap: 1.5rem; align-items: baseline; padding-bottom: .5rem; border-bottom: 2px solid #531f5f; }
+.cabecera nav a { margin-right: 1rem; }
+.filtro { margin: 1rem 0; }
+tfoot td { font-weight: 600; }
+.etiqueta { background: #efe6f1; border-radius: .3rem; padding: 0 .3rem; }
+fieldset { border: 1px solid #ddd; margin: 1rem 0; }

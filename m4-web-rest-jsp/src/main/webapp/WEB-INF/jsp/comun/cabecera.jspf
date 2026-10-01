@@ -1,0 +1,10 @@
+<%-- EJ 4.5 - Fragmento común (.jspf). Se incluye con la directiva include: se copia dentro de la JSP al
+     traducirla, así que usa los taglib que declare la página que lo incluye (aquí, "c"). --%>
+<header class="cabecera">
+    <strong>Atech &middot; Reservas</strong>
+    <nav>
+        <a href="<c:url value='/salas'/>">Salas</a>
+        <a href="<c:url value='/salas/nueva'/>">Nueva sala</a>
+        <a href="<c:url value='/swagger-ui.html'/>">API REST (Swagger UI)</a>
+    </nav>
+</header>

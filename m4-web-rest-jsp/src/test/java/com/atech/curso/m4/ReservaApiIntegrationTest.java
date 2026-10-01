@@ -77,6 +77,37 @@ class ReservaApiIntegrationTest {
         given().when().get("/salas")
             .then().statusCode(200)
                 .contentType(containsString("text/html"))
-                .body(containsString("Turing"));
+                .body(containsString("Turing"))
+                .body(containsString("Videoconferencia"))      // equipamiento cargado con @EntityGraph
+                .body(containsString("4 salas"));              // fn:length en el pie de la tabla
+    }
+
+    @Test
+    void elListadoJspSeFiltraPorTipo() {
+        given().queryParam("tipo", "AUDITORIO").when().get("/salas")
+            .then().statusCode(200)
+                .body(containsString("Berners-Lee"))
+                .body(org.hamcrest.Matchers.not(containsString("Turing")))
+                .body(containsString("<option value=\"AUDITORIO\" selected"));
+    }
+
+    @Test
+    void elFormularioJspPintaDesplegableYCasillas() {
+        given().when().get("/salas/nueva")
+            .then().statusCode(200)
+                .body(containsString("<select id=\"tipo\" name=\"tipo\""))
+                .body(containsString("name=\"equipamiento\""))
+                .body(containsString("Atech &middot; Reservas"));       // cabecera.jspf incluida
+    }
+
+    @Test
+    void alEditarSeMarcanElTipoYElEquipamientoDeLaSala() {
+        // Turing (id 1): REUNIONES, con Pizarra (id 1) y Videoconferencia (id 3)
+        given().when().get("/salas/1/editar")
+            .then().statusCode(200)
+                .body(containsString("<option value=\"REUNIONES\" selected=\"selected\""))
+                .body(containsString("value=\"1\" checked=\"checked\""))
+                .body(containsString("value=\"3\" checked=\"checked\""))
+                .body(org.hamcrest.Matchers.not(containsString("value=\"2\" checked=\"checked\"")));
     }
 }

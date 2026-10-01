@@ -33,6 +33,15 @@
 - `@WebMvcTest` + `@MockitoBean` para los controladores MVC y REST, estos últimos con REST Assured (`spring-mock-mvc`).
 - `@SpringBootTest(webEnvironment = RANDOM_PORT)` + REST Assured: ciclo de vida completo, contrato `/v3/api-docs` y renderizado real de la JSP.
 
+### EJ 4.5 · Ampliación: tipo de sala, equipamiento y validación entre campos
+1. Añade a la sala un **tipo** (`enum TipoSala`: reuniones, formación, auditorio, cada uno con su aforo máximo), un **email del responsable** y su **equipamiento**: una entidad `Equipo` relacionada con `@ManyToMany`.
+2. `formulario.jsp`: `form:select` + `form:options` para el tipo y `form:checkboxes` para el equipamiento (el formulario guarda los **ids** marcados). Las opciones llegan al modelo con métodos `@ModelAttribute`.
+3. Validaciones: `@NotNull` en el tipo, `@NotBlank` + `@Email` en el email y una **restricción propia a nivel de clase**, `@CapacidadSegunTipo`, que cuelga el error del campo `capacidad` y rellena `{tipo}` y `{max}` en el mensaje.
+4. `lista.jsp`: filtro por tipo con un formulario GET que conserva la opción (`${param.tipo}`), enlaces con `c:url` + `c:param`, un acumulador con `c:set`, `fn:length`, un `c:forEach` anidado para el equipamiento y una cabecera común incluida con `<%@ include %>` (`WEB-INF/jsp/comun/cabecera.jspf`).
+5. Con `open-in-view=false`, carga el equipamiento con `@EntityGraph` para que la JSP no lance `LazyInitializationException`.
+
+*Solución:* `CapacidadSegunTipo`, `SalaWebController`, `dominio/Equipo`, `dominio/TipoSala` · *Tests:* `SalaWebControllerTest`, `CapacidadSegunTipoValidatorTest`, `SalaRepositoryTest` y los de JSP de `ReservaApiIntegrationTest`.
+
 ## Extra Spring Boot 4
 - **Versionado de API** nativo:
   ```properties
