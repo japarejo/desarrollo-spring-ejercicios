@@ -17,7 +17,7 @@ Hay un módulo Maven por cada tema del curso, y todos giran en torno al mismo do
 | [`m3-persistencia`](m3-persistencia) | Spring Data JPA | Entidades y relaciones, `@Embeddable` record, consultas derivadas, JPQL, proyecciones, Specifications, Flyway, transacciones y `rollbackFor` (la alternancia de un gobierno de superhéroes), bloqueo optimista, N+1, Testcontainers, menú de consola interactivo |
 | [`m4-web-rest-jsp`](m4-web-rest-jsp) | Spring MVC | JSP + JSTL 3.0 + formularios, API REST, `ProblemDetail`, paginación, springdoc/OpenAPI, `@WebMvcTest`, REST Assured |
 | [`m5-amqp`](m5-amqp) | RabbitMQ | Exchanges/colas/DLQ, JSON, consumidores idempotentes, reintentos, `RepublishMessageRecoverer`, publisher confirms, Testcontainers |
-| [`m6-integration`](m6-integration) | Spring Integration | `@MessagingGateway`, JDBC poller, filtro, splitter, router, agregador, HTTP y AMQP salientes, `errorChannel`, `MockIntegrationContext` |
+| [`m6-integration`](m6-integration) | Spring Integration | `@MessagingGateway` (Swagger UI), *pollers* JDBC y de ficheros, filtro, splitter, router, agregador, canal publicar-suscribir, HTTP, AMQP y ficheros salientes, `errorChannel`, `MockIntegrationContext` |
 | [`m7-security-oauth2`](m7-security-oauth2) | Spring Security | Varias `SecurityFilterChain`, login social OIDC/OAuth 2.0, alta automática, Resource Server JWT (Keycloak), roles, seguridad de método, `RestClient` + OAuth 2.0, tests |
 | [`extra-xml-config`](extra-xml-config) | *Extra:* configuración XML | El mismo grafo de objetos con `beans.xml`, con `@Configuration`/`@Bean` y mezclando ambos con `@ImportResource`; equivalencias y por qué el XML quedó como legado |
 
@@ -69,7 +69,7 @@ El workflow de GitHub Actions (`.github/workflows/ci.yml`) ejecuta `./mvnw verif
 |---|---|---|
 | Aplicación | todos | http://localhost:8080 |
 | Consola H2 | m2 | http://localhost:8080/h2-console |
-| Swagger UI | m4 | http://localhost:8080/swagger-ui.html |
+| Swagger UI | m4, m5, m6 | http://localhost:8080/swagger-ui.html |
 | RabbitMQ (gestión) | m5, m6 | http://localhost:15672 (guest/guest) |
 | Keycloak | m7 | http://localhost:8180 (admin/admin) |
 

@@ -10,3 +10,6 @@ target/
 .factorypath
 .DS_Store
 .env
+
+# Buzones de ficheros del módulo 6 (se crean al arrancar)
+m6-integration/buzon/
