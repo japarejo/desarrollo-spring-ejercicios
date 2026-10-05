@@ -270,6 +270,20 @@ aplicación en el paso 3) y la consola de RabbitMQ (<http://localhost:15672>, gu
    ([`data.sql`](src/main/resources/data.sql)): tres líneas pendientes, dos de la solicitud `S-100` y una de
    `S-101`.
 
+   **⌨️ Y compruébalo en la consola H2** (<http://localhost:8080/h2-console>, JDBC URL
+   `jdbc:h2:mem:reservas`, usuario `sa`, sin contraseña):
+
+   ```sql
+   SELECT * FROM linea_pendiente;
+   ```
+
+   Las tres filas están ya en `PROCESADA`: es el `updateSql` en acción. **⌨️ Mete una fila nueva** y mira
+   cómo, en menos de 10 segundos, cambia de estado y aparece su justificante en `buzon/salida`:
+
+   ```sql
+   INSERT INTO linea_pendiente (solicitud_id, sala, fecha, horas) VALUES ('S-102', 'Turing', DATE '2030-03-09', 5);
+   ```
+
 5. **✏️ La tercera puerta: el buzón de ficheros**
    ([líneas 95-105](src/main/java/com/atech/curso/m6/flujos/FlujosReservas.java#L95-L105)):
 

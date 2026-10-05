@@ -68,7 +68,7 @@ El workflow de GitHub Actions (`.github/workflows/ci.yml`) ejecuta `./mvnw verif
 | Servicio | Módulo | URL |
 |---|---|---|
 | Aplicación | todos | http://localhost:8080 |
-| Consola H2 | m2 | http://localhost:8080/h2-console |
+| Consola H2 | m2, m6 | http://localhost:8080/h2-console |
 | Swagger UI | m4, m5, m6 | http://localhost:8080/swagger-ui.html |
 | RabbitMQ (gestión) | m5, m6 | http://localhost:15672 (guest/guest) |
 | Keycloak | m7 | http://localhost:8180 (admin/admin) |

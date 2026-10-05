@@ -13,6 +13,7 @@ docker compose -f m6-integration/compose.yaml up -d      # RabbitMQ 4.1 + consol
 |---|---|
 | Entrada **web** | Swagger UI: <http://localhost:8080/swagger-ui.html> → `POST /api/solicitudes` (ejemplos `S-1` y `S-VACIA` ya rellenos) |
 | Entrada **base de datos** | Nada: al arrancar, el *poller* procesa las solicitudes `S-100` y `S-101` de [`data.sql`](src/main/resources/data.sql) |
+| Ver la **tabla** `linea_pendiente` | Consola H2: <http://localhost:8080/h2-console> (JDBC URL `jdbc:h2:mem:reservas`, usuario `sa`, sin contraseña) |
 | Entrada **fichero** | `cp m6-integration/ejemplos/solicitudes.csv m6-integration/buzon/entrada/` |
 | Ver las solicitudes **descartadas** | Swagger UI → `GET /api/solicitudes/descartadas` |
 | Ver la salida **RabbitMQ** | <http://localhost:15672> → *Queues* → `solicitudes.procesadas` → *Get messages* |
